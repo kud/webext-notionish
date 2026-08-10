@@ -16,5 +16,10 @@ browser.commands.onCommand.addListener(async (command) => {
 
   browser.tabs
     .sendMessage(tab.id, { type: "notionish:toggle-focus" })
-    .catch(() => {})
+    .catch((error) => {
+      // "No receiving end" is expected on any tab without the content script. Anything
+      // else — a missing host permission, say — is a real fault, and swallowing it
+      // silently is why the shortcut appeared to do nothing at all.
+      if (!/receiving end/i.test(error?.message ?? "")) console.error(error)
+    })
 })

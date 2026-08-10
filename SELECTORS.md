@@ -56,3 +56,22 @@ selector that fails to match costs nothing but a slightly less-hidden toolbar; a
 selector that's too broad can take the document canvas down with it. Never target
 `.kix-appview-editor` or `.waffle` with `display: none` or similar — those are the
 documents themselves.
+
+## Verifying these live
+
+`tools/selector-probe.js` is the instrument for this. Open a Google Doc, press
+`Cmd+Opt+K` for the page console (not the Browser Console), paste the file's
+contents, and read the three outputs:
+
+- **`gate`** — whether `content.js` set `data-notionish-surface` / `data-notionish-focus`.
+  Unset means no rule can fire and the selectors below are irrelevant; the fault is
+  in `content.js`, the stored prefs, or a stale add-on that was never reloaded.
+- **`matches`** — per selector, how many nodes exist and how many are *still visible*.
+  `found: 0` means the selector is simply wrong. `found: 1, stillVisible: 1` means it
+  matched and `display: none !important` lost anyway — a specificity or shadow-DOM
+  problem, and a different fix entirely.
+- **`furniture`** — visible chrome we are failing to hide, with real class names,
+  excluding anything inside `.kix-page` so document content doesn't drown the signal.
+
+Update the confidence tiers above from what it reports. Nothing in this file has
+been confirmed against a live document yet.

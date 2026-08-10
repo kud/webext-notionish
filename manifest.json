@@ -11,7 +11,11 @@
       }
     }
   },
-  "permissions": ["storage"],
+  "permissions": [
+    "storage",
+    "https://docs.google.com/*",
+    "https://sheets.google.com/*"
+  ],
   "background": {
     "scripts": ["src/background.js"]
   },
