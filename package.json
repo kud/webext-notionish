@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "description": "Restyles Google Docs and Sheets to read like Notion, hiding the chrome around the document.",
   "private": true,
-  "homepage": "https://kud.io/projects/webext-notionish",
   "author": "kud",
   "license": "MIT",
   "type": "module",

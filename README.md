@@ -1,5 +1,9 @@
 <div align="center">
 
+📝
+
+# Notionish
+
 ![Firefox](https://img.shields.io/badge/Firefox-FF7139?style=flat-square&logo=firefoxbrowser&logoColor=white)
 ![Manifest V2](https://img.shields.io/badge/Manifest-V2-663399?style=flat-square)
 ![MIT](https://img.shields.io/badge/licence-MIT-22C55E?style=flat-square)
