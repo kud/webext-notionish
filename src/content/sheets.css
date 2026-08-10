@@ -1,0 +1,32 @@
+/* Notionish — Google Sheets focus mode
+   Gate: html[data-notionish-surface="sheets"][data-notionish-focus="on"]. If that
+   attribute pair is never set, none of this fires and stock Google Sheets renders
+   untouched — see src/content.js for how it's set, and SELECTORS.md for the full
+   confidence tiering of every selector below. Summary:
+     HIGH   #docs-titlebar, #docs-menubar, #docs-toolbar-wrapper, .waffle
+     LOW    #t-formula-bar-container, .formula-bar-container
+   .waffle is the known-stable grid-canvas anchor from the project brief — it is
+   never hidden, only used as a scoping reference below. */
+
+html[data-notionish-surface="sheets"][data-notionish-focus="on"] {
+  background: #fffefc;
+}
+
+html[data-notionish-surface="sheets"][data-notionish-focus="on"] #docs-titlebar,
+html[data-notionish-surface="sheets"][data-notionish-focus="on"] #docs-menubar,
+html[data-notionish-surface="sheets"][data-notionish-focus="on"]
+  #docs-toolbar-wrapper {
+  display: none !important;
+}
+
+/* Formula bar — LOW confidence selectors, unverified live. Two alternate forms are
+   listed to raise the odds of a match; if neither hits, the formula bar simply
+   stays visible, which is a no-op, not a break. */
+html[data-notionish-surface="sheets"][data-notionish-focus="on"]
+  #t-formula-bar-container,
+html[data-notionish-surface="sheets"][data-notionish-focus="on"]
+  .formula-bar-container {
+  display: none !important;
+}
+
+/* .waffle (the grid) is deliberately untouched — no rule targets it. */

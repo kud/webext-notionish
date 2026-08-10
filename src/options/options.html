@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Notionish Options</title>
+    <style>
+      body {
+        max-width: 600px;
+        margin: 40px auto;
+        font-family: system-ui, sans-serif;
+      }
+
+      label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 12px 0;
+        font-size: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Notionish</h1>
+    <p>Choose which Google surfaces get the Notion-ish focus treatment.</p>
+
+    <label><input type="checkbox" id="docs-enabled" /> Google Docs</label>
+    <label><input type="checkbox" id="sheets-enabled" /> Google Sheets</label>
+
+    <p>
+      On any enabled tab, press <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>N</kbd> —
+      or use the toolbar button — to bring the full Google UI back without
+      disabling the extension.
+    </p>
+
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

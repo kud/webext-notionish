@@ -1,0 +1,46 @@
+/* Notionish — Google Docs focus mode
+   Gate: html[data-notionish-surface="docs"][data-notionish-focus="on"]. If that
+   attribute pair is never set, none of this fires and stock Google Docs renders
+   untouched — see src/content.js for how it's set, and SELECTORS.md for the full
+   confidence tiering of every selector below. Summary:
+     HIGH   #docs-titlebar, #docs-menubar, #docs-toolbar-wrapper, .kix-appview-editor
+     MEDIUM .docs-ruler-container
+     LOW    .docs-tabbar-container, .docs-gm-addon-bar
+   LOW-confidence rules are deliberately narrow and additive: if the selector is
+   wrong, that one piece of chrome just stays visible — never a hidden document. */
+
+html[data-notionish-surface="docs"][data-notionish-focus="on"] {
+  background: #fffefc;
+}
+
+html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-titlebar,
+html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-menubar,
+html[data-notionish-surface="docs"][data-notionish-focus="on"]
+  #docs-toolbar-wrapper,
+html[data-notionish-surface="docs"][data-notionish-focus="on"]
+  .docs-ruler-container {
+  display: none !important;
+}
+
+/* Document tab strip (multi-tab-per-document) and the right-hand app rail
+   (Explore / add-ons icons) — both LOW confidence, see header comment. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"]
+  .docs-tabbar-container,
+html[data-notionish-surface="docs"][data-notionish-focus="on"]
+  .docs-gm-addon-bar {
+  display: none !important;
+}
+
+/* .kix-appview-editor is the known-stable editing-canvas anchor — used here only
+   to recolour the backdrop behind the page, never hidden. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"]
+  .kix-appview-editor {
+  background: #fffefc;
+}
+
+/* Page drop-shadow and border removed so the document reads as continuous rather
+   than a sheet of paper floating on a grey backdrop. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .kix-page {
+  box-shadow: none !important;
+  border: none !important;
+}

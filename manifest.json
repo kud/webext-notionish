@@ -1,0 +1,54 @@
+{
+  "manifest_version": 2,
+  "name": "Notionish",
+  "description": "Restyles Google Docs and Sheets to read like Notion, hiding the chrome around the document.",
+  "version": "0.1.0",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "notionish@kud.io",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  },
+  "permissions": ["storage"],
+  "background": {
+    "scripts": ["src/background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://docs.google.com/*", "https://sheets.google.com/*"],
+      "js": ["src/content.js"],
+      "css": [
+        "src/content/shared.css",
+        "src/content/docs.css",
+        "src/content/sheets.css"
+      ],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ],
+  "browser_action": {
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "48": "src/icons/icon.svg"
+    }
+  },
+  "options_ui": {
+    "page": "src/options/options.html",
+    "browser_style": true
+  },
+  "commands": {
+    "toggle-focus": {
+      "suggested_key": {
+        "default": "Alt+Shift+N"
+      },
+      "description": "Toggle Notionish focus mode on the current tab"
+    }
+  },
+  "icons": {
+    "48": "src/icons/icon.svg",
+    "96": "src/icons/icon.svg",
+    "128": "src/icons/icon.svg"
+  }
+}
