@@ -6,26 +6,58 @@
    disabled — every rule below is inert and stock Google chrome renders untouched.
 
    Scoped to Closure Library base classes (.goog-menu, .modal-dialog) that Google
-   Docs/Sheets context menus and dialogs are built on. These are framework classes,
-   not app-specific ones, so they're comparatively low-risk — but unverified this
-   session. Failure mode is cosmetic only (an unstyled but fully working menu or
-   dialog), never a hidden or broken one. See SELECTORS.md. */
+   Docs/Sheets context menus and dialogs are built on. .goog-menu is confirmed live
+   (32 nodes on a real Doc); .modal-dialog is not — both probe runs happened with no
+   dialog open, so zero matches proved nothing. Failure mode is cosmetic only (an
+   unstyled but fully working menu or dialog), never a hidden one. See SELECTORS.md. */
 
+/* Deliberately ungated, and deliberately inert. Firefox injects content_scripts CSS
+   at user-stylesheet origin, so it never appears in document.styleSheets the way it
+   does in Chrome — leaving no way to tell "the add-on isn't loaded here" apart from
+   "it's loaded but content.js never set the gate". Those want opposite fixes. This
+   property is readable via getComputedStyle regardless of the gate, so
+   tools/selector-probe.js can tell them apart. */
+:root {
+  --notionish-css: loaded;
+}
+
+/* Tokens taken from a Notion *page*, not from notion.so. The marketing site runs a
+   warm #f6f5f4 canvas and a rule against full-page white; the product does the
+   opposite — a page is plain white edge to edge with no frame, which is also what
+   makes a document read as continuous. Target the app, not the homepage.
+
+   NotionInter is a proprietary tuning of Inter, so Inter is the substitute Notion's
+   own design system names. #37352f is Notion's product text colour. */
 html[data-notionish-surface][data-notionish-focus="on"] {
   --notionish-font:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    Inter, -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Helvetica,
+    Arial, sans-serif;
+  --notionish-canvas: #ffffff;
+  --notionish-surface: #ffffff;
   --notionish-fg: #37352f;
-  --notionish-border: #ebe9e5;
+  --notionish-fg-muted: #615d59;
+  --notionish-border: #e6e6e6;
+  --notionish-radius: 8px;
 }
 
 html[data-notionish-surface][data-notionish-focus="on"] .goog-menu,
 html[data-notionish-surface][data-notionish-focus="on"] .modal-dialog {
-  font-family: var(--notionish-font);
-  color: var(--notionish-fg);
-  border-color: var(--notionish-border);
-  border-radius: 8px;
+  font-family: var(--notionish-font) !important;
+  color: var(--notionish-fg) !important;
+  background: var(--notionish-surface) !important;
+  border-color: var(--notionish-border) !important;
+  border-radius: var(--notionish-radius) !important;
+  /* Elevation by many near-transparent layers rather than one hard cast — Notion's
+     stated approach, and the reason its surfaces lift without announcing it. */
+  box-shadow:
+    rgba(0, 0, 0, 0.02) 0 0.8px 2.9px,
+    rgba(0, 0, 0, 0.027) 0 2px 7.8px,
+    rgba(0, 0, 0, 0.04) 0 4px 18px !important;
 }
 
 html[data-notionish-surface][data-notionish-focus="on"] .goog-menuitem {
-  font-family: var(--notionish-font);
+  font-family: var(--notionish-font) !important;
+  /* Menu rows round tighter than the menu that holds them (5px vs 8px) — the
+     contrast is deliberate in Notion's radius scale, not an inconsistency. */
+  border-radius: 5px;
 }
