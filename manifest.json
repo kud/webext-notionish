@@ -11,6 +11,7 @@
       }
     }
   },
+  "web_accessible_resources": ["src/fonts/inter-variable.woff2"],
   "permissions": [
     "storage",
     "https://docs.google.com/*",
