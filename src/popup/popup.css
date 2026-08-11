@@ -152,6 +152,19 @@ h1 {
   cursor: default;
 }
 
+.btn-secondary {
+  margin-top: 8px;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  filter: none;
+  color: var(--fg);
+  border-color: var(--faint);
+}
+
 .hint {
   margin: 12px 0 0;
   font-size: 11px;

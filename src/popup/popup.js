@@ -14,6 +14,8 @@ const detectSurface = (url) => {
   return null
 }
 
+const anyEnabled = (prefs) => prefs.docsEnabled || prefs.sheetsEnabled
+
 document.addEventListener("DOMContentLoaded", async () => {
   const dotEl = document.getElementById("dot")
   const statusEl = document.getElementById("status")
@@ -21,11 +23,39 @@ document.addEventListener("DOMContentLoaded", async () => {
   const enableLabelEl = document.getElementById("enable-label")
   const enabledEl = document.getElementById("enabled")
   const actionEl = document.getElementById("action")
+  const disableEl = document.getElementById("disable")
   const optionsEl = document.getElementById("options")
 
   optionsEl.addEventListener("click", (event) => {
     event.preventDefault()
     browser.runtime.openOptionsPage()
+  })
+
+  const prefs = await getPrefs()
+
+  // Wired before the surface check below, which returns early on any other tab.
+  // Turning Notionish off is exactly the thing you want to reach from a tab where
+  // it is misbehaving, and that tab is often not the Doc itself.
+  //
+  // This flips both surface prefs rather than disabling the add-on in Firefox's
+  // sense — an extension cannot disable itself without the management permission,
+  // which would be a heavy ask for a cosmetic restyler. With both prefs off,
+  // content.js sets no attributes and every rule is inert, which is the same
+  // observable result. It stays a toggle rather than a one-way switch: the
+  // per-surface control is removed on non-Docs tabs, so a disable-only button
+  // would strand you in the options page to undo it.
+  const renderDisable = (current) => {
+    disableEl.textContent = anyEnabled(current)
+      ? "Turn Notionish off"
+      : "Turn Notionish on"
+  }
+
+  renderDisable(prefs)
+
+  disableEl.addEventListener("click", async () => {
+    const next = !anyEnabled(await getPrefs())
+    await setPrefs({ docsEnabled: next, sheetsEnabled: next })
+    window.close()
   })
 
   const [tab] = await browser.tabs.query({ active: true, currentWindow: true })
@@ -39,7 +69,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   const prefKey = SURFACE_PREF_KEY[surface]
-  const prefs = await getPrefs()
 
   const render = (enabled) => {
     enableLabelEl.textContent = `Enabled on ${SURFACE_LABEL[surface]}`
@@ -56,6 +85,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   enabledEl.addEventListener("change", async () => {
     await setPrefs({ [prefKey]: enabledEl.checked })
     render(enabledEl.checked)
+    renderDisable(await getPrefs())
   })
 
   actionEl.addEventListener("click", () => {
