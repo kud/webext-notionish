@@ -4,6 +4,7 @@ const DEFAULT_PREFS = {
   docsEnabled: true,
   sheetsEnabled: true,
   fontOverride: false,
+  zoomFactor: 1.3,
 }
 
 // The families Docs and Sheets set body text in. Deliberately sans-only: a document
@@ -74,9 +75,40 @@ const detectSurface = (url) => {
   return null
 }
 
+// Type size is the one thing chrome removal cannot reach: Docs paints body text
+// into a canvas, so no selector sets its size and the @font-face route above only
+// swaps the family. Browser zoom is the lever that does work, and it works for a
+// specific reason — full page zoom changes the pixel ratio Docs renders against, so
+// it repaints the canvas at the new size rather than resampling one. CSS `zoom` or
+// a transform would scale the bitmap Docs already drew, and the text would come back
+// soft. This is real, sharp, Docs-laid-out text at a larger size.
+//
+// It is also a view setting rather than a document one, which is what makes it
+// usable where pageless mode was not: nobody else's copy of the document changes.
+//
+// tabs.setZoom lives on an API no content script can reach, so this asks the
+// background script instead. Scope and the reason for it are documented there.
+const applyZoom = (factor) =>
+  browser.runtime
+    .sendMessage({ type: "notionish:zoom", factor })
+    .catch((error) => console.error("Notionish: zoom request failed", error))
+
 const surface = detectSurface(new URL(location.href))
 
+// The toggle listener runs synchronously and needs the zoom factor, which lives in
+// storage. Cached on every apply rather than re-read, so Alt+Shift+N cannot land
+// between the keypress and a storage round-trip.
+let currentPrefs = DEFAULT_PREFS
+
+// Docs only. Sheets cell text is painted to canvas the same way and would zoom
+// just as well, but a spreadsheet at 130% shows fewer rows — that is a change to
+// how much you can see, not to how comfortably you can read it, and it is not what
+// this option is for.
+const zoomFor = (focus) =>
+  surface === "docs" && focus === "on" ? currentPrefs.zoomFactor : 1
+
 const applySurface = (prefs) => {
+  currentPrefs = prefs
   const root = document.documentElement
   const enabled =
     surface === "docs"
@@ -94,6 +126,7 @@ const applySurface = (prefs) => {
   }
 
   applyFontOverride(enabled && prefs.fontOverride)
+  applyZoom(zoomFor(root.dataset.notionishFocus))
 }
 
 // Only wire up listeners when we're actually on a Docs/Sheets document — nothing to
@@ -118,6 +151,8 @@ if (surface) {
     if (!root.dataset.notionishSurface) return
     const focus = root.dataset.notionishFocus === "on" ? "off" : "on"
     root.dataset.notionishFocus = focus
+    // Focus off means the full Google UI is back, and a Doc at 130% is not that.
+    applyZoom(zoomFor(focus))
     return Promise.resolve({ focus })
   })
 }

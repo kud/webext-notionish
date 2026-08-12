@@ -5,6 +5,7 @@ const DEFAULT_PREFS = {
   docsEnabled: true,
   sheetsEnabled: true,
   fontOverride: false,
+  zoomFactor: 1.3,
 }
 
 // Defaults are deliberately NOT written to storage on install. Every read goes
@@ -14,6 +15,32 @@ const DEFAULT_PREFS = {
 // anyone who had already installed, and flipping the constant afterwards had no
 // effect at all: get() only fills in keys that are missing, and that one no longer
 // was. Found the hard way on 2026-08-11.
+
+// tabs.setZoom needs no "tabs" permission — the host permissions for
+// docs.google.com and sheets.google.com already in the manifest are enough. That
+// matters for what this extension is allowed to know: "tabs" would hand a cosmetic
+// restyler the URL of every open tab, and nothing here needs one.
+//
+// per-tab scope, deliberately, and this is the part worth not changing. Firefox
+// defaults zoom changes to per-origin, which writes into the site zoom it
+// remembers for docs.google.com — a setting that outlives Notionish being toggled
+// off, disabled, or uninstalled, leaving every Doc at 130% with nothing on screen
+// to explain why. per-tab persists across loads within the tab and nowhere else,
+// and content.js re-applies it on every load, so nothing is lost by the narrower
+// scope.
+//
+// Not an async listener: one would return a promise for *every* message, including
+// ones meant for another listener, and answer them all with undefined.
+browser.runtime.onMessage.addListener((message, sender) => {
+  if (message?.type !== "notionish:zoom") return
+  const tabId = sender.tab?.id
+  if (tabId == null) return
+
+  return browser.tabs
+    .setZoomSettings(tabId, { scope: "per-tab", mode: "automatic" })
+    .then(() => browser.tabs.setZoom(tabId, message.factor))
+    .then(() => ({ zoom: message.factor }))
+})
 
 browser.commands.onCommand.addListener(async (command) => {
   if (command !== "toggle-focus") return

@@ -22,6 +22,7 @@ v1 is deliberately cosmetic and narrow: it hides the furniture around the docume
 
 - 🙈 **Hides the furniture** — removes Docs' menu row, toolbar, both rulers (there is a vertical one), and the left rail holding the outline and tab strip. The thin title band stays: a Notion page carries one strip of context too.
 - 📊 **Sheets, decluttered** — hides the menu row and toolbar while leaving the grid untouched.
+- 🔍 **Docs text at a readable size** — the one thing chrome removal cannot reach. Body text is painted to a canvas, so no stylesheet sets its size; browser zoom changes the resolution Docs renders against, so the canvas is repainted larger rather than scaled up and the text stays sharp. Applied per tab while focus mode is on, reverted the moment it is off, and never written to the site-wide zoom Firefox remembers for you.
 - 🎨 **Warm surface treatment** — swaps Google's grey backdrop and paper drop-shadow for a continuous, Notion-ish page.
 - ✍️ **Notion-ish chrome typography** — restyles the UI that survives (comment cards, dialogs, context menus) to match.
 - ⌨️ **One-key toggle** — `Alt+Shift+N`, or the popup button, brings the full Google UI back instantly without disabling the extension.
@@ -61,6 +62,8 @@ Notionish is CSS-first by design. `src/content.js` runs at `document_start`, res
 
 That split is deliberate: **if the JS never runs, or a selector stops matching after a Google redesign, the corresponding attribute is simply never set and the rule stays inert.** The failure mode is always "you see Google's normal interface" — never a hidden or broken page.
 
+Two things sit outside that split, both because canvas is unreachable from a stylesheet: the optional `@font-face` injection, and the page zoom the background script applies via `tabs.setZoom`. Neither touches the document — zoom is a property of your view of the tab, which is exactly why it is usable where Docs' own pageless mode was not.
+
 Surface detection is URL-based rather than host-based: `docs.google.com` hosts both Docs (`/document/*`) and Docs-embedded Sheets (`/spreadsheets/*`), while `sheets.google.com` is a separate host that redirects into the same app — so the host alone can't say which surface a tab is on. Slides and Drive itself are left untouched.
 
 Every selector the stylesheets rely on is tracked in [`SELECTORS.md`](SELECTORS.md), tiered by evidence rather than by confidence: CONFIRMED (matched on a live document), CONFIRMED ABSENT (matched nothing, do not reinstate), or UNVERIFIED. The first pass through a running Doc and Sheet moved most entries, and not in the direction anyone expected — two selectors carried as high-confidence matched zero nodes.
@@ -69,7 +72,7 @@ Every selector the stylesheets rely on is tracked in [`SELECTORS.md`](SELECTORS.
 
 These are informed exclusions, not gaps:
 
-- **Document body text and cell contents.** Both are painted to `<canvas>`. The typography is reachable — canvas resolves font families through the same machinery as the DOM, so an `@font-face` injected at author origin does change what Docs paints — but it is not usable: Docs positions each formatting run at a coordinate derived from the original font's measurements, so any visually different substitute makes adjacent runs overlap. It ships as an option, off by default, documented as an experiment. Measure and layout stay out of reach outright.
+- **The document's typeface.** Canvas resolves font families through the same machinery as the DOM, so an `@font-face` injected at author origin does change what Docs paints. It is not usable: Docs positions each formatting run at a coordinate derived from the original font's measurements, so any visually different substitute makes adjacent runs overlap. Ships as an option, off by default, documented as an experiment. (Text *size* is a different question and is solved — see the zoom feature above. Measure and line layout stay out of reach outright.)
 - **Page geometry.** Docs' own pageless mode is the only real fix for the page-shaped page, and it is a document setting stored server-side — turning it on changes the document for everyone who opens it. Not viable on a shared doc.
 - **A Notion-style Drive navigation sidebar.** Injecting one is a v2 project of its own; it needs Drive API OAuth.
 - **Google Slides.**
