@@ -217,6 +217,16 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input
      Under border-box the same declaration would eat into it and cause the clipping
      it was added to fix. */
   padding: 3px 7px !important;
+  /* Docs sizes this input's height for its own font. Inter sits taller at the same
+     size, so the descenders on g, y and p clip against a box measured for Google
+     Sans — visible only in rename mode, which is the one state anyone looks at the
+     box itself rather than the text on top of it.
+
+     height: auto hands the sizing back to the content, the same move as
+     field-sizing on the horizontal. line-height: normal because a fixed one would
+     re-impose the problem in a different unit. */
+  height: auto !important;
+  line-height: normal !important;
 }
 
 /* The rename affordance is drawn by a wrapper as well as the input itself, and the
