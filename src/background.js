@@ -21,13 +21,24 @@ const DEFAULT_PREFS = {
 // matters for what this extension is allowed to know: "tabs" would hand a cosmetic
 // restyler the URL of every open tab, and nothing here needs one.
 //
-// per-tab scope, deliberately, and this is the part worth not changing. Firefox
-// defaults zoom changes to per-origin, which writes into the site zoom it
-// remembers for docs.google.com — a setting that outlives Notionish being toggled
-// off, disabled, or uninstalled, leaving every Doc at 130% with nothing on screen
-// to explain why. per-tab persists across loads within the tab and nowhere else,
-// and content.js re-applies it on every load, so nothing is lost by the narrower
-// scope.
+// Scope is per-origin, and not by choice. This first shipped asking for per-tab —
+// precisely to avoid writing the site zoom Firefox remembers for docs.google.com —
+// and Firefox rejected it outright: "Unsupported zoom settings: {mode: automatic,
+// scope: per-tab}". per-tab is only offered alongside mode "manual", where the
+// browser stops applying zoom and the extension is expected to scale the page
+// itself. For a canvas document that means a CSS transform over a bitmap Docs has
+// already painted, which is the soft-text outcome the whole approach exists to
+// avoid. automatic is the only mode that repaints, and automatic means per-origin.
+//
+// So this does write the site zoom, and the mitigation is discipline rather than
+// scope: content.js calls setZoom(1) whenever focus goes off or the surface is
+// disabled, on every load. The one hole left is uninstalling with focus on, which
+// leaves docs.google.com zoomed with nothing on screen to explain why — said plainly
+// in the options page rather than engineered around, because there is no uninstall
+// hook to hang a reset on.
+//
+// Not calling setZoomSettings at all: automatic/per-origin is already the default,
+// and asking for it explicitly only creates another way to be rejected.
 //
 // Not an async listener: one would return a promise for *every* message, including
 // ones meant for another listener, and answer them all with undefined.
@@ -37,8 +48,7 @@ browser.runtime.onMessage.addListener((message, sender) => {
   if (tabId == null) return
 
   return browser.tabs
-    .setZoomSettings(tabId, { scope: "per-tab", mode: "automatic" })
-    .then(() => browser.tabs.setZoom(tabId, message.factor))
+    .setZoom(tabId, message.factor)
     .then(() => ({ zoom: message.factor }))
 })
 
