@@ -81,6 +81,19 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-titlebar-bu
   background-color: var(--notionish-canvas) !important;
 }
 
+/* The row sits at the top of a band taller than itself. Docs sizes that band for
+   chrome we have hidden and content we have scaled down, so the leftover height
+   collects underneath and the whole row reads as riding high.
+
+   Centred on the container rather than by trimming the band's height: the height is
+   Docs' to compute, and fighting it means guessing a number that stops being right
+   the moment the zoom or the font changes. Centring holds whatever the height turns
+   out to be. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-header-container {
+  display: flex !important;
+  align-items: center !important;
+}
+
 /* Typeface only. Size and weight were pushed down to 14px/500 to read as a Notion
    breadcrumb, and at that scale the band stopped looking like a header at all — so
    Docs' own metrics stay and only the face changes.
@@ -109,6 +122,41 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input
 
    Metrics are safe to change because they move the pair together. Paint is not,
    because the pair is asymmetric by design. Leave Docs' colour alone. */
+
+/* Docs sets an inline pixel width on the title input, measured from the label span
+   in Docs' own font. Change the face and that number stops describing the text:
+   Inter runs wider than Google Sans at the same size, so the title overruns its box
+   and lands under the file-type badge that follows it.
+
+   field-sizing hands the width back to the browser, which does track the font. The
+   wrapper needs releasing too — it carries its own measured width, and an input free
+   to grow inside a fixed parent just overflows something one level further out.
+
+   Guarded, because the fallback is worse than the bug: without field-sizing support,
+   width: auto on an <input> means the size attribute — around twenty characters,
+   unrelated to this title. A slightly-too-narrow box beats an arbitrary one. */
+@supports (field-sizing: content) {
+  html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input {
+    field-sizing: content !important;
+    width: auto !important;
+    min-width: 2ch !important;
+  }
+
+  html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input-wrapper,
+  html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input-label {
+    width: auto !important;
+  }
+}
+
+/* Vertical centring for the row. The title, the badges and the icon buttons are
+   different heights and were aligned by Docs against its own font's metrics; a
+   different face shifts the text box within the line and the icons stop agreeing
+   with it. Stated explicitly rather than left to inline-block baselines, which is
+   what made it font-dependent in the first place. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-titlebar {
+  display: flex !important;
+  align-items: center !important;
+}
 
 html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input:hover,
 html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input:focus {
