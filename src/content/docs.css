@@ -31,6 +31,22 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"]
   display: none !important;
 }
 
+/* The header band is kept, but it should not grow with the document. Browser zoom
+   is the only lever that reaches canvas text (see src/content.js), and it scales
+   everything — so the chrome we deliberately left in place gets 30% heavier for no
+   benefit. --notionish-header-scale is the reciprocal of the zoom factor, set on
+   <html> by content.js, and 1 when zoom is off.
+
+   zoom rather than transform: scale(). zoom participates in layout, so the band also
+   takes proportionally less height and the document moves up to meet it. A transform
+   would shrink the band visually while leaving its original height reserved beneath
+   it as a dead strip — the same mistake as hiding #docs-menubar inside a container
+   that stays, which this file already records once. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"]
+  #docs-header-container {
+  zoom: var(--notionish-header-scale, 1);
+}
+
 /* Both rulers — there is a vertical one down the left edge as well as the familiar
    horizontal one. .docs-ruler is the class they share; #kix-horizontal-ruler-container
    is the 16px band the horizontal ruler sits in, which keeps its height if only the

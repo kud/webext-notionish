@@ -88,10 +88,24 @@ const detectSurface = (url) => {
 //
 // tabs.setZoom lives on an API no content script can reach, so this asks the
 // background script instead. Scope and the reason for it are documented there.
-const applyZoom = (factor) =>
-  browser.runtime
+const applyZoom = (factor) => {
+  // Browser zoom scales the whole page, header included — and the header is the one
+  // part that should not grow. It is chrome, and a title bar rendered at 130% is
+  // heavy in precisely the way this extension exists to fix.
+  //
+  // Unlike the document, the header is DOM, so it can be scaled back by the exact
+  // reciprocal. The reciprocal is computed here rather than as calc(1 / var(…)) in
+  // the stylesheet: CSS cannot read a preference, and handing it a plain number
+  // avoids depending on calc() being accepted where a <number> is expected.
+  document.documentElement.style.setProperty(
+    "--notionish-header-scale",
+    String(1 / factor),
+  )
+
+  return browser.runtime
     .sendMessage({ type: "notionish:zoom", factor })
     .catch((error) => console.error("Notionish: zoom request failed", error))
+}
 
 const surface = detectSurface(new URL(location.href))
 
