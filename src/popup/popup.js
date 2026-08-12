@@ -70,6 +70,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const prefKey = SURFACE_PREF_KEY[surface]
 
+  // The zoom actually applied can be below the one in options, because a page that
+  // does not fit the window gets clamped to what does. Silently differing from a
+  // number the user set is the kind of thing that reads as the setting not working,
+  // so the popup says which it is.
+  const zoomNote = async (enabled) => {
+    if (!enabled || surface !== "docs" || prefs.zoomFactor <= 1) return ""
+    const zoom = await browser.tabs.getZoom(tab.id).catch(() => null)
+    if (zoom === null || Math.abs(zoom - prefs.zoomFactor) < 0.01) return ""
+    return ` Zoom is ${Math.round(zoom * 100)}%, capped from ${Math.round(prefs.zoomFactor * 100)}% to fit this window.`
+  }
+
   const render = (enabled) => {
     enableLabelEl.textContent = `Enabled on ${SURFACE_LABEL[surface]}`
     enabledEl.checked = enabled
@@ -81,6 +92,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   render(prefs[prefKey])
+  zoomNote(prefs[prefKey]).then((note) => {
+    if (note) statusEl.textContent += note
+  })
 
   enabledEl.addEventListener("change", async () => {
     await setPrefs({ [prefKey]: enabledEl.checked })

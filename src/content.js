@@ -88,15 +88,56 @@ const detectSurface = (url) => {
 //
 // tabs.setZoom lives on an API no content script can reach, so this asks the
 // background script instead. Scope and the reason for it are documented there.
-const applyZoom = (factor) => {
+// A Docs page is 816 CSS px — US Letter at 96dpi — and does not change with zoom,
+// since CSS pixels are what zoom scales the viewport *against*. Measured rather than
+// trusted once a page exists, because A4 documents are 794; the constant only has to
+// carry the first call, at document_start, when there is no page to measure.
+const DEFAULT_PAGE_WIDTH = 816
+const CHROME_ALLOWANCE = 64
+
+const pageWidth = () =>
+  document.querySelector(".kix-page-paginated")?.getBoundingClientRect().width ||
+  DEFAULT_PAGE_WIDTH
+
+let appliedZoom = 1
+
+const askZoom = () =>
+  browser.runtime
+    .sendMessage({ type: "notionish:zoom-get" })
+    .then((reply) => reply?.zoom ?? null)
+    .catch(() => null)
+
+// Zoom past what the window can hold and the page stops fitting: Docs pins an
+// overflowing page to the left of its scroll area and the right-hand text is simply
+// off screen. 130% of an 816px page needs about 1060px plus room for a scrollbar, so
+// on a 1007px window the honest answer is 115%, not 130%.
+//
+// innerWidth is in CSS px and shrinks as zoom rises, so innerWidth * currentZoom is
+// invariant — the width the window would have at 100%. That invariance is what stops
+// the resize handler oscillating: applying a zoom changes innerWidth and leaves this
+// product alone, so recomputing after the change returns the same answer and the
+// second pass is a no-op.
+const fitFactor = (wanted, currentZoom) => {
+  const widthAtHundred = window.innerWidth * currentZoom
+  const largestThatFits = (widthAtHundred - CHROME_ALLOWANCE) / pageWidth()
+  return Math.max(1, Math.min(wanted, largestThatFits))
+}
+
+const applyZoom = async (wanted) => {
+  // Falling back to the last applied value rather than to 1: a failed query would
+  // otherwise read as "the window is tiny" and clamp the zoom away entirely.
+  const currentZoom = (await askZoom()) ?? appliedZoom
+  const factor = wanted <= 1 ? 1 : fitFactor(wanted, currentZoom)
+  appliedZoom = factor
+
   // Browser zoom scales the whole page, header included — and the header is the one
   // part that should not grow. It is chrome, and a title bar rendered at 130% is
   // heavy in precisely the way this extension exists to fix.
   //
   // Unlike the document, the header is DOM, so it can be scaled back by the exact
-  // reciprocal. The reciprocal is computed here rather than as calc(1 / var(…)) in
-  // the stylesheet: CSS cannot read a preference, and handing it a plain number
-  // avoids depending on calc() being accepted where a <number> is expected.
+  // reciprocal. Computed here rather than as calc(1 / var(…)) in the stylesheet: CSS
+  // cannot read a preference, and handing it a plain number avoids depending on
+  // calc() being accepted where a <number> is expected.
   document.documentElement.style.setProperty(
     "--notionish-header-scale",
     String(1 / factor),
@@ -163,6 +204,18 @@ const applySurface = (prefs) => {
 // toggle or watch preferences for otherwise.
 if (surface) {
   browser.storage.sync.get(DEFAULT_PREFS).then(applySurface)
+
+  // What fits depends on the window, so the answer changes when the window does.
+  // Debounced because a drag fires this continuously, and each pass costs a message
+  // round trip to the background script.
+  let resizeTimer
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer)
+    resizeTimer = setTimeout(
+      () => applyZoom(zoomFor(document.documentElement.dataset.notionishFocus)),
+      150,
+    )
+  })
 
   browser.storage.onChanged.addListener((changes, area) => {
     if (area !== "sync") return

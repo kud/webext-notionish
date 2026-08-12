@@ -42,6 +42,15 @@ const DEFAULT_PREFS = {
 //
 // Not an async listener: one would return a promise for *every* message, including
 // ones meant for another listener, and answer them all with undefined.
+// content.js needs the tab's current zoom to work out how wide the window really
+// is, and tabs.getZoom is not reachable from a content script. Answered here.
+browser.runtime.onMessage.addListener((message, sender) => {
+  if (message?.type !== "notionish:zoom-get") return
+  const tabId = sender.tab?.id
+  if (tabId == null) return
+  return browser.tabs.getZoom(tabId).then((zoom) => ({ zoom }))
+})
+
 browser.runtime.onMessage.addListener((message, sender) => {
   if (message?.type !== "notionish:zoom") return
   const tabId = sender.tab?.id
