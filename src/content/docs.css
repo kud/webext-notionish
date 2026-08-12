@@ -66,6 +66,29 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input
   border-color: transparent !important;
   background: rgba(55, 53, 47, 0.08) !important;
   border-radius: 5px !important;
+  /* Docs sets an inline pixel width on this input, measured from the title's rendered
+     text, and pads it by 6px a side — which is snug enough that a box you can
+     actually see reads as clipping the text. Measured 2026-08-12: scrollWidth and
+     clientWidth are both 241, so nothing was ever cut.
+
+     Safe to widen only because the input computes to box-sizing: content-box, so
+     padding grows the box outward and leaves Docs' measured content width untouched.
+     Under border-box the same declaration would eat into it and cause the clipping
+     it was added to fix. */
+  padding: 2px 10px !important;
+}
+
+/* The rename affordance is drawn by a wrapper as well as the input itself, and the
+   wrapper only takes its border once the title is being edited — a state that ends
+   the moment you click into the console to inspect it, which is why the element
+   query that found .docs-title-input never saw this one.
+
+   :has() rather than a guessed class name. The relationship is what we actually know
+   — "whatever element wraps the title input" — and naming it from memory is how
+   .waffle and .kix-page got into this codebase. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-header-container *:has(> .docs-title-input) {
+  border-color: transparent !important;
+  box-shadow: none !important;
 }
 
 html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input:focus-visible {
