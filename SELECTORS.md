@@ -61,6 +61,18 @@ Docs was verified live the same day, against a real document:
 - `.kix-appview-editor` — present. Also `.kix-appview-editor-container`, its parent.
 - `.kix-page-paginated` — a document page. Carries `canvas-first-page` and
   `kix-page-canvas-compact-mode` alongside.
+- `.jfk-button-action` — the Share pill, the primary half of a split control.
+  **background-color takes on this element and border does not** — measured
+  2026-08-12, when clearing the fill worked and no outline ever appeared. Docs wins
+  the border declaration somewhere `!important` does not reach. Outline it with
+  `box-shadow: inset`, which draws the same hairline without touching the border box,
+  follows border-radius, and takes no part in layout.
+- `.docs-branding-icon` (holding `.docs-branding-icon-img.docs-icon-docs-2026-36x36`)
+  — the Docs logo, a 36px sprite. Its class names its own size.
+- `.docs-title-input-wrapper` / `.docs-title-input-label` — the boxes around the title
+  pair. Both must carry `vertical-align: middle` along with the inline-blocks inside
+  them: the row aligns on baselines, so an element can be middle-aligned inside a
+  wrapper that is not, and hang off the wrapper's baseline regardless.
 - `.docs-titlebar-buttons` — the right-hand cluster (history, comments, Share,
   Gemini, avatar). Paints Docs' header colour `rgb(248, 250, 253)` at depth 3 inside
   `#docs-header-container`, which is why the band renders two-tone once the canvas
@@ -96,6 +108,27 @@ Docs was verified live the same day, against a real document:
 - `.docs-gm` — no rule uses it.
 - `.modal-dialog` (in `shared.css`) — inconclusive rather than absent: both probe
   runs happened with no dialog open, so zero matches proves nothing either way.
+
+## Properties Docs wins, and what to reach for instead
+
+Existence and specificity are the first two failure modes. The third is a property
+Docs holds on to whatever the stylesheet says, and it is only ever found by measuring
+one element against another:
+
+| Wanted | Loses on | Use instead |
+| ------ | -------- | ----------- |
+| An outline on `.jfk-button-action` | `border` | `box-shadow: inset 0 0 0 1px` |
+| A frame off `.kix-page-paginated` | `border`, `box-shadow` | `outline: none` — it is drawn by outline |
+| Vertical position in the header row | `margin` guesses | `vertical-align: middle` on the row |
+| Anything structural | — | Nothing. `display` cannot fail quietly; see below |
+
+**`display` is the one property to never impose.** Every other rule here fails inert —
+a selector that misses costs a visible toolbar and nothing more. `display: flex` on
+`#docs-header-container` changed the containing block for its absolutely-positioned
+children and collapsed the entire band, greyed the title and shrank Share to an icon.
+Local properties adjust elements inside the layout Docs built; structural ones replace
+that layout with a different algorithm and silently rewrite what every rule Docs wrote
+about those children means.
 
 ## Specificity, not just existence
 
