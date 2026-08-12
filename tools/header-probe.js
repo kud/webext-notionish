@@ -112,6 +112,39 @@
   console.log("painted backgrounds in the header:")
   console.table(painted)
 
+  // A tint the header does not paint is still a tint you can see — it comes from an
+  // ancestor showing through, or a sibling sitting behind. Both are outside every
+  // query above, so the band can read as two-tone while this probe reports one
+  // painted region and nothing wrong. Walk up as well as down.
+  const behind = []
+  for (let el = header.parentElement; el && el !== document.documentElement; el = el.parentElement) {
+    const cs = getComputedStyle(el)
+    behind.push({
+      el: label(el),
+      bgColor: cs.backgroundColor,
+      bgImage: cs.backgroundImage === "none" ? "—" : cs.backgroundImage.slice(0, 50),
+      w: Math.round(el.getBoundingClientRect().width),
+    })
+  }
+  console.log("ancestors behind the header:")
+  console.table(behind)
+
+  // Reported separately because background-image is invisible to a background-color
+  // rule, and a cleared colour over a surviving gradient is another change that
+  // looks exactly like no change.
+  const imaged = [...header.querySelectorAll("*")]
+    .filter(visible)
+    .filter((el) => getComputedStyle(el).backgroundImage !== "none")
+    .filter((el) => el.getBoundingClientRect().width <= bandWidth)
+    .map((el) => ({
+      el: label(el),
+      bgImage: getComputedStyle(el).backgroundImage.slice(0, 60),
+      left: Math.round(el.getBoundingClientRect().left),
+      w: Math.round(el.getBoundingClientRect().width),
+    }))
+  console.log("background images in the header:")
+  console.table(imaged)
+
   const payload = JSON.stringify({ row, painted }, null, 2)
   try {
     copy(payload)

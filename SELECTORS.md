@@ -61,6 +61,10 @@ Docs was verified live the same day, against a real document:
 - `.kix-appview-editor` — present. Also `.kix-appview-editor-container`, its parent.
 - `.kix-page-paginated` — a document page. Carries `canvas-first-page` and
   `kix-page-canvas-compact-mode` alongside.
+- `.docs-titlebar-buttons` — the right-hand cluster (history, comments, Share,
+  Gemini, avatar). Paints Docs' header colour `rgb(248, 250, 253)` at depth 3 inside
+  `#docs-header-container`, which is why the band renders two-tone once the canvas
+  behind it is repainted white. Confirmed 2026-08-12 by `tools/header-probe.js`.
 - `.docs-title-input-label-inner` (in `.docs-title-input-label`) — **the title's
   twin.** A span displaying the same string, stacked exactly on the input. Confirmed
   2026-08-12 by `tools/header-probe.js`, which reports every visible element in the
