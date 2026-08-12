@@ -173,25 +173,18 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-titlebar-bu
   background-color: var(--notionish-canvas) !important;
 }
 
-/* Typeface only. Size and weight were pushed down to 14px/500 to read as a Notion
-   breadcrumb, and at that scale the band stopped looking like a header at all — so
-   Docs' own metrics stay and only the face changes.
+/* The title keeps Docs' own font, and that is a decision rather than an oversight.
 
-   THE TITLE IS RENDERED TWICE. input.docs-title-input is the field you type into;
-   span#docs-title-input-label-inner sits on top of it displaying the same string,
-   and Docs measures the span to size the input. They coincide only while they share
-   their metrics, so any rule aimed at the title must name both — styling one alone
-   showed the title twice, superimposed at different sizes.
+   Inter was applied here with the rest of the header and cost three separate fixes:
+   the inline width Docs measured in Google Sans stopped matching, so the title ran
+   under the file-type badge; the baseline moved and took the row's alignment with it;
+   and the box Docs sized for its own font clipped Inter's descenders in rename mode.
+   Each had a fix, and each fix needed another.
 
-   No colour here either, deliberately. The pair is asymmetric: only the label paints,
-   and a colour rule aimed at "the title" makes the copy that was never meant to show
-   visible too. Match the metrics, never the paint. */
-html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input,
-html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input-label-inner,
-html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input-label {
-  font-family: var(--notionish-font) !important;
-}
-
+   The common cause is that this element's geometry is computed by Docs from its own
+   font's metrics, in JavaScript, at moments we do not control. A typeface change is
+   not a paint change here — it moves every number Docs already committed to. The rest
+   of the header carries Inter happily because nothing measures it. */
 /* NO colour rule here, and this is the third correction to this one block. The two
    elements do not merely coincide — only one of them paints. Docs keeps the input's
    own text invisible and lets the label span do the displaying, so a
@@ -216,17 +209,7 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input
      padding grows the box outward and leaves Docs' measured content width untouched.
      Under border-box the same declaration would eat into it and cause the clipping
      it was added to fix. */
-  padding: 3px 7px !important;
-  /* Docs sizes this input's height for its own font. Inter sits taller at the same
-     size, so the descenders on g, y and p clip against a box measured for Google
-     Sans — visible only in rename mode, which is the one state anyone looks at the
-     box itself rather than the text on top of it.
-
-     height: auto hands the sizing back to the content, the same move as
-     field-sizing on the horizontal. line-height: normal because a fixed one would
-     re-impose the problem in a different unit. */
-  height: auto !important;
-  line-height: normal !important;
+  padding: 2px 6px !important;
 }
 
 /* The rename affordance is drawn by a wrapper as well as the input itself, and the
