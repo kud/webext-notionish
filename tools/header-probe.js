@@ -68,7 +68,43 @@
   )
   console.table(row)
 
-  const payload = JSON.stringify(row, null, 2)
+  // Backgrounds sit on containers, and the gap table above deliberately reports only
+  // leaves — so a two-tone band is invisible in it. Asked separately: every element
+  // in the header actually painting a colour, whatever its depth.
+  //
+  // Reported as a list of what IS painted rather than a check of what should be,
+  // because the elements keeping Docs' header colour are exactly the ones nobody
+  // thought to name. Deciding which to clear is a judgement about each colour — the
+  // Share pill's blue is wanted and the band's #f9fbfd is not — so the probe hands
+  // back colours and lets that call be made with them in view.
+  const painted = [...header.querySelectorAll("*")]
+    .filter(visible)
+    .filter((el) => {
+      const bg = getComputedStyle(el).backgroundColor
+      return bg !== "transparent" && !/rgba\(0, 0, 0, 0\)/.test(bg)
+    })
+    .map((el) => {
+      const r = el.getBoundingClientRect()
+      return {
+        el: label(el),
+        bg: getComputedStyle(el).backgroundColor,
+        left: Math.round(r.left),
+        right: Math.round(r.right),
+        w: Math.round(r.width),
+        h: Math.round(r.height),
+        depth: (() => {
+          let d = 0
+          for (let n = el; n && n !== header; n = n.parentElement) d++
+          return d
+        })(),
+      }
+    })
+    .sort((a, b) => a.left - b.left)
+
+  console.log("painted backgrounds in the header:")
+  console.table(painted)
+
+  const payload = JSON.stringify({ row, painted }, null, 2)
   try {
     copy(payload)
     console.log("%c↑ copied to clipboard", "color:#22C55E")
