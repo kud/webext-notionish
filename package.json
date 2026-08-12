@@ -16,6 +16,7 @@
     "probe:spacing": "pbcopy < tools/spacing-probe.js && echo 'spacing probe copied — page console (Cmd+Opt+K), Cmd+V, Enter'",
     "probe:model": "pbcopy < tools/model-probe.js && echo 'model probe copied — page console (Cmd+Opt+K), Cmd+V, Enter'",
     "probe:title": "pbcopy < tools/title-query.js && echo 'title query copied — paste, then click into the document title'",
+    "probe:header": "pbcopy < tools/header-probe.js && echo 'header probe copied — page console (Cmd+Opt+K), Cmd+V, Enter'",
     "build": "rm -rf web-ext-artifacts/* 2>/dev/null || true && web-ext build --source-dir=. --artifacts-dir=web-ext-artifacts --ignore-files=publish.sh --ignore-files=tools --ignore-files='tools/**' --ignore-files=package-lock.json --ignore-files='.github/**'",
     "lint": "web-ext lint --ignore-files=publish.sh --ignore-files=tools --ignore-files='tools/**' --ignore-files=package-lock.json --ignore-files='.github/**'",
     "version": "sed -E -i 's/^(\\s*\"version\":\\s*)\"[^\"]*\"/\\1\"'\"$npm_package_version\"'\"/' manifest.json && git add manifest.json",

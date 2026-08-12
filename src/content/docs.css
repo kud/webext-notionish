@@ -61,6 +61,36 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"]
    background tint is a perfectly good signal for someone whose pointer is already on
    the target and a weak one for someone arriving by Tab, and :focus-visible is
    exactly the distinction. */
+/* Toward Notion's breadcrumb bar: small, quiet, tight — not a document title
+   rendered at word-processor scale. 14px is Notion's own, and inside this band it
+   means 14px on screen: the counter-zoom above returns the header to nominal, so
+   sizes written here are read at face value rather than multiplied by the zoom. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: var(--notionish-fg) !important;
+  font-family: var(--notionish-font) !important;
+}
+
+/* Docs sets an inline pixel width on this input, measured from the title's text at
+   18px. Shrink the font and that width does not follow — leaving a 241px box around
+   14px of text and a pocket of dead space before the breadcrumb. The same
+   JS-measures-what-CSS-changed mismatch that produced the off-centre page and the
+   title that looked clipped.
+
+   field-sizing: content hands sizing back to the browser, which does track the font.
+   Guarded by @supports because the fallback is not graceful: without it, width: auto
+   on an <input> falls back to the size attribute — roughly twenty characters, which
+   has nothing to do with this title. Better to keep Docs' slightly-wrong width than
+   to swap it for a wholly unrelated one. */
+@supports (field-sizing: content) {
+  html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input {
+    field-sizing: content !important;
+    width: auto !important;
+    min-width: 2ch !important;
+  }
+}
+
 html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input:hover,
 html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input:focus {
   border-color: transparent !important;
