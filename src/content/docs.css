@@ -144,7 +144,7 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input
      padding grows the box outward and leaves Docs' measured content width untouched.
      Under border-box the same declaration would eat into it and cause the clipping
      it was added to fix. */
-  padding: 2px 10px !important;
+  padding: 3px 7px !important;
 }
 
 /* The rename affordance is drawn by a wrapper as well as the input itself, and the
@@ -160,9 +160,19 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-header-cont
   box-shadow: none !important;
 }
 
+/* No focus ring on this one, and the reasoning that put one here was wrong.
+   :focus-visible was chosen to keep a ring for keyboard users while sparing pointer
+   users — but a text input matches :focus-visible on *every* focus, mouse included,
+   because the spec treats anything accepting keyboard input as always warranting the
+   ring. So the rule fired on click and drew a hard 2px box: precisely what removing
+   Docs' own border was meant to avoid.
+
+   Dropping it costs nothing here, unlike on a button. A focused text field shows a
+   blinking caret in it, which is a stronger and more specific signal than an outline
+   and is present however the focus arrived. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input:focus,
 html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input:focus-visible {
-  outline: 2px solid var(--notionish-fg-muted) !important;
-  outline-offset: 1px !important;
+  outline: none !important;
 }
 
 /* Both rulers — there is a vertical one down the left edge as well as the familiar
