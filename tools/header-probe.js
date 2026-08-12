@@ -31,6 +31,8 @@
   // Excluded by shape rather than by class name: anything wider than the header it
   // sits in is not a thing in the header's layout.
   const bandWidth = header.getBoundingClientRect().width
+  const bandBox = header.getBoundingClientRect()
+  const bandCentre = bandBox.top + bandBox.height / 2
 
   const leaves = [...header.querySelectorAll("*")]
     .filter(visible)
@@ -53,7 +55,14 @@
       gapBefore: gap,
       left: Math.round(r.left),
       w: Math.round(r.width),
+      // The vertical axis, added 2026-08-12 after three guesses at a misalignment
+      // this probe could not see. centreOffset is the number that matters: how far
+      // this element's middle sits from the band's middle. Zero is aligned; the sign
+      // says which way it drifts. Reporting top and height alone means doing that
+      // arithmetic by eye across twenty rows, which is how the guessing started.
+      top: Math.round(r.top),
       h: Math.round(r.height),
+      centreOffset: Math.round(r.top + r.height / 2 - bandCentre),
       marginX: `${px(cs.marginLeft)} / ${px(cs.marginRight)}`,
       paddingX: `${px(cs.paddingLeft)} / ${px(cs.paddingRight)}`,
       parent: label(el.parentElement),
@@ -73,6 +82,10 @@
     getComputedStyle(document.documentElement)
       .getPropertyValue("--notionish-header-scale")
       .trim() || "(unset)",
+  )
+  console.log(
+    "band:",
+    `top ${Math.round(bandBox.top)} · height ${Math.round(bandBox.height)} · centre ${Math.round(bandCentre)}`,
   )
   console.table(row)
 
