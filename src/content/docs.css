@@ -82,9 +82,18 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input
 html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input-label {
   font-size: 14px !important;
   font-weight: 500 !important;
-  color: var(--notionish-fg) !important;
   font-family: var(--notionish-font) !important;
 }
+
+/* NO colour rule here, and this is the third correction to this one block. The two
+   elements do not merely coincide — only one of them paints. Docs keeps the input's
+   own text invisible and lets the label span do the displaying, so a
+   `color: … !important` aimed at "the title" paints the copy that was never meant to
+   show, and the title renders twice: first at two sizes when only the input was
+   styled, then interleaved at one size when both were.
+
+   Metrics are safe to change because they move the pair together. Paint is not,
+   because the pair is asymmetric by design. Leave Docs' colour alone. */
 
 html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input:hover,
 html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input:focus {
