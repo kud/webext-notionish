@@ -45,9 +45,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   // per-surface control is removed on non-Docs tabs, so a disable-only button
   // would strand you in the options page to undo it.
   const renderDisable = (current) => {
+    // "off everywhere" against the action button's "on this tab". The two do the
+    // same thing to the page and differ entirely in scope and memory — one flips an
+    // attribute on this document until it reloads, the other writes storage.sync and
+    // reaches every Docs tab on every synced machine. Buttons that look alike and
+    // read alike are indistinguishable in use, whatever the code does.
     disableEl.textContent = anyEnabled(current)
-      ? "Turn Notionish off"
-      : "Turn Notionish on"
+      ? "Turn off everywhere"
+      : "Turn on everywhere"
   }
 
   renderDisable(prefs)
