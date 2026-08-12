@@ -121,7 +121,15 @@ src/
 | `npm run version` | Syncs `manifest.json`'s version from `package.json` (used by release tooling) |
 | `npm run publish` | Builds and opens the AMO Developer Hub for a first manual submission          |
 
-`tools/` holds the two page-console probes: `selector-probe.js` answers *which elements are there*, `spacing-probe.js` answers *which element owns each gap*. Neither ships in the package. Paste one into the page console on a real Doc — see [`SELECTORS.md`](SELECTORS.md) for how to read the output.
+`tools/` holds three page-console probes, none of which ship in the package:
+
+| Command | Probe | Answers |
+| ------- | ----- | ------- |
+| `npm run probe:selectors` | `selector-probe.js` | which elements are there, and which are visible despite a rule |
+| `npm run probe:spacing` | `spacing-probe.js` | which element owns each gap, and the page's box geometry |
+| `npm run probe:model` | `model-probe.js` | what Docs' own document model contains, straight from the page HTML |
+
+Each copies itself to the clipboard, because the step after "which probe do I want" is always "get it into the console" — paste into the page console on a real Doc (`Cmd+Opt+K`, not the Browser Console) and read the output per [`SELECTORS.md`](SELECTORS.md). macOS only, being `pbcopy`; `cat` the file anywhere else.
 
 Both `src/background.js` and `src/content.js` load as classic (non-module) scripts under Manifest V2, so they duplicate `DEFAULT_PREFS` from `src/lib/storage.js` rather than importing it — `storage.js` itself is only imported by the popup and options page, which do run as ES modules.
 
