@@ -114,6 +114,31 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-titlebar-bu
   background-color: rgba(55, 53, 47, 0.06) !important;
 }
 
+/* Share, matched to the icon buttons beside it: white, grey outline.
+
+   box-shadow: inset rather than border, and that is the whole reason this attempt
+   works where the last two did not. On this element background-color took and border
+   did not — the fill came off and no outline ever appeared — so Docs is winning the
+   border declaration somewhere we cannot see. An inset shadow draws the same hairline
+   without touching the border box at all, follows border-radius for free, and takes
+   no part in layout, so it cannot square off the pill's rounded end the way the
+   earlier attempt did.
+
+   Both halves of the split control get the ring. The seam where they meet reads as
+   two hairlines rather than one, which is what a split button looks like anyway. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-titlebar-buttons .jfk-button-action,
+html[data-notionish-surface="docs"][data-notionish-focus="on"] #scb-quick-actions-menu-button {
+  background-color: var(--notionish-canvas) !important;
+  color: var(--notionish-fg) !important;
+  box-shadow: inset 0 0 0 1px rgba(55, 53, 47, 0.16) !important;
+  border-color: transparent !important;
+}
+
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-titlebar-buttons .jfk-button-action:hover,
+html[data-notionish-surface="docs"][data-notionish-focus="on"] #scb-quick-actions-menu-button:hover {
+  background-color: rgba(55, 53, 47, 0.04) !important;
+}
+
 /* The rename affordance. Measured live 2026-08-12: input.docs-title-input carries a
    1px border at 4px radius which is *transparent at rest* and coloured in by Docs on
    hover and focus. Against the header's usual pale blue-grey that reads as a soft
