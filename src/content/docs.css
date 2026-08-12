@@ -47,6 +47,32 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"]
   zoom: var(--notionish-header-scale, 1);
 }
 
+/* The rename affordance. Measured live 2026-08-12: input.docs-title-input carries a
+   1px border at 4px radius which is *transparent at rest* and coloured in by Docs on
+   hover and focus. Against the header's usual pale blue-grey that reads as a soft
+   outline; against the white band this extension puts behind it, the same border
+   reads as a hard box drawn around the title.
+
+   Not a bug we introduced, and still ours to fix — the border was tuned for a
+   background we replaced. Swapped for Notion's idiom for the identical affordance:
+   no outline, a faint fill on hover.
+
+   The keyboard focus ring is deliberately kept rather than folded into the fill. A
+   background tint is a perfectly good signal for someone whose pointer is already on
+   the target and a weak one for someone arriving by Tab, and :focus-visible is
+   exactly the distinction. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input:hover,
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input:focus {
+  border-color: transparent !important;
+  background: rgba(55, 53, 47, 0.08) !important;
+  border-radius: 5px !important;
+}
+
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input:focus-visible {
+  outline: 2px solid var(--notionish-fg-muted) !important;
+  outline-offset: 1px !important;
+}
+
 /* Both rulers — there is a vertical one down the left edge as well as the familiar
    horizontal one. .docs-ruler is the class they share; #kix-horizontal-ruler-container
    is the 16px band the horizontal ruler sits in, which keeps its height if only the

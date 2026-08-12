@@ -61,6 +61,15 @@ Docs was verified live the same day, against a real document:
 - `.kix-appview-editor` — present. Also `.kix-appview-editor-container`, its parent.
 - `.kix-page-paginated` — a document page. Carries `canvas-first-page` and
   `kix-page-canvas-compact-mode` alongside.
+- `.docs-title-input` — the document title, an `<input>` inside the header band.
+  Confirmed 2026-08-12 by querying every bordered element in `#docs-header-container`
+  rather than by guessing at a name. Carries a 1px border at 4px radius which is
+  `rgba(0,0,0,0)` at rest — Docs colours it on hover/focus, so a probe run without
+  hovering reports a border that is real and invisible.
+- `#docs-header-container` also holds, all confirmed the same way and none of them
+  currently styled: `#docs-classification-badge`, `#docs-external-badge`,
+  `#docs-chat`, `#docs-revisions-appbarbutton`, `#docs-docos-commentsbutton`,
+  `#scb-quick-actions-menu-button`.
 
 **CONFIRMED ABSENT — Docs.** Matched zero nodes on a live 2026 Doc:
 
