@@ -23,6 +23,17 @@ browser.commands.onCommand.addListener(async (command) => {
 
   browser.tabs
     .sendMessage(tab.id, { type: "notionish:toggle-focus" })
+    .then((reply) => {
+      // The content script answers with the state it landed on. Resolving with
+      // nothing means it listened and declined — a Docs tab whose gate attributes
+      // were never set — which is a third outcome that neither the success path nor
+      // the catch below would otherwise distinguish from a working toggle.
+      if (!reply) {
+        console.warn(
+          "Notionish: toggle reached the tab but no gate was set — reload it.",
+        )
+      }
+    })
     .catch((error) => {
       // "No receiving end" is expected on any tab without the content script. Anything
       // else — a missing host permission, say — is a real fault, and swallowing it

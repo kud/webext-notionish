@@ -106,11 +106,18 @@ if (surface) {
     browser.storage.sync.get(DEFAULT_PREFS).then(applySurface)
   })
 
+  // Answers with the state it landed on, rather than returning nothing. A toggle
+  // that reports back is the difference between "the message arrived and did
+  // something" and "the message arrived at a tab where the gate was never set" —
+  // which sendMessage alone cannot tell apart, since both resolve identically.
+  // The early return above is one of those cases: content.js is present and
+  // listening, so there is a receiving end, but there is nothing to toggle.
   browser.runtime.onMessage.addListener((message) => {
     if (message?.type !== "notionish:toggle-focus") return
     const root = document.documentElement
     if (!root.dataset.notionishSurface) return
-    root.dataset.notionishFocus =
-      root.dataset.notionishFocus === "on" ? "off" : "on"
+    const focus = root.dataset.notionishFocus === "on" ? "off" : "on"
+    root.dataset.notionishFocus = focus
+    return Promise.resolve({ focus })
   })
 }

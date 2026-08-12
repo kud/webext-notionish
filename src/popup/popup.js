@@ -88,8 +88,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderDisable(await getPrefs())
   })
 
-  actionEl.addEventListener("click", () => {
-    browser.tabs.sendMessage(tab.id, { type: "notionish:toggle-focus" })
-    window.close()
+  // Closing the popup on the same tick as the send is how this failure hid for two
+  // sessions: window.close() destroys the only context that could have reported the
+  // rejection, so a message that never arrived and one that toggled the page look
+  // exactly alike. Close only once the content script has answered; on anything
+  // else, stay open and say what happened.
+  actionEl.addEventListener("click", async () => {
+    actionEl.disabled = true
+    try {
+      const reply = await browser.tabs.sendMessage(tab.id, {
+        type: "notionish:toggle-focus",
+      })
+      // A reply of undefined means the listener ran and declined — the tab is a Doc,
+      // the content script is live, but the gate attributes are not set. Reloading
+      // is the fix, and it is not what "no receiving end" would have told us.
+      if (!reply) {
+        statusEl.textContent =
+          "Notionish is loaded here but not active yet — reload the tab."
+        actionEl.disabled = false
+        return
+      }
+      window.close()
+    } catch (error) {
+      statusEl.textContent = /receiving end/i.test(error?.message ?? "")
+        ? "This tab was open before Notionish loaded — reload it and try again."
+        : `Could not reach this tab: ${error?.message ?? error}`
+      actionEl.disabled = false
+    }
   })
 })

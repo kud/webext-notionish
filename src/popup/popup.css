@@ -57,12 +57,16 @@ header {
   flex: none;
 }
 
+/* Filled when on, a hollow ring when off. The two states have to differ in shape,
+   not only in fill — two dots of the same size separated by colour alone are one
+   dot to a colourblind reader, and this popup's whole job is reporting state. */
 .dot[data-tone="on"] {
   background: var(--accent);
 }
 
 .dot[data-tone="off"] {
-  background: var(--faint);
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--faint);
 }
 
 h1 {
