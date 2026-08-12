@@ -78,6 +78,46 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input
    group hangs off the wrapper's baseline instead. Hence the row above reaching the
    titlebar's own children, not only the inline-blocks inside them. */
 
+/* The surviving right-hand cluster, quieted. Everything else in the band is now
+   white and 14px-ish, and against that a Material blue Share pill is the loudest
+   thing on screen — the one piece of Google still announcing itself.
+
+   Notion's own button treatment: no fill, a hairline border, text in the product's
+   near-black, and a faint grey on hover. Colours only, no geometry — these are
+   ordinary buttons rather than the title's hidden-twin pair, so paint is safe here
+   in a way it was not there.
+
+   Selectors confirmed live 2026-08-12 by tools/header-probe.js: the pill is
+   .jfk-button at depth 5 painting rgb(194, 231, 255), the dropdown half is
+   #scb-quick-actions-menu-button beside it. The avatar and the Gemini mark keep
+   their colour deliberately — one is a photo and the other is a product mark, and
+   draining either reads as broken rather than restrained. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-titlebar-buttons .jfk-button,
+html[data-notionish-surface="docs"][data-notionish-focus="on"] #scb-quick-actions-menu-button {
+  background-color: transparent !important;
+  color: var(--notionish-fg) !important;
+  border: 1px solid var(--notionish-border) !important;
+  box-shadow: none !important;
+}
+
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-titlebar-buttons .jfk-button:hover,
+html[data-notionish-surface="docs"][data-notionish-focus="on"] #scb-quick-actions-menu-button:hover {
+  background-color: rgba(55, 53, 47, 0.06) !important;
+}
+
+/* The split button is two halves of one control — the pill and its dropdown — so the
+   border between them doubles up and reads as a gap. Collapse the shared edge. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"] #scb-quick-actions-menu-button {
+  border-left: none !important;
+}
+
+/* The Share glyph is a sprite tinted by background-color, so it takes the rule above
+   and vanishes. Restored explicitly rather than excluded from the selector, which
+   would leave the pill's own fill behind. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-titlebar-buttons .scb-icon {
+  background-color: rgb(0, 74, 119) !important;
+}
+
 /* The rename affordance. Measured live 2026-08-12: input.docs-title-input carries a
    1px border at 4px radius which is *transparent at rest* and coloured in by Docs on
    hover and focus. Against the header's usual pale blue-grey that reads as a soft
