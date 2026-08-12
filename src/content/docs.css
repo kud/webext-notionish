@@ -79,6 +79,23 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-titlebar-bu
   background-color: transparent !important;
 }
 
+/* The Docs logo is a 36px sprite — its own class says so, docs-icon-docs-2026-36x36
+   — which is app-bar scale, not breadcrumb scale. Notion sets a page icon at roughly
+   text size beside its title, and 36px next to 14px text is what makes this band read
+   as a product header rather than a breadcrumb.
+
+   zoom rather than transform: scale(). The image is a background sprite, so the only
+   ways to resize it are scaling the box or recomputing background-size against a
+   sprite sheet whose geometry is Google's to change. Scaling wins, and zoom scales
+   the layout box with the paint — a transform would shrink the logo while leaving a
+   36px hole around it, which is the gap this is meant to close.
+
+   Compounds with the header's own counter-zoom above, deliberately: 0.769 × 0.55 of
+   36px lands near 20px on screen, beside 14px text. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-branding-icon {
+  zoom: 0.55;
+}
+
 /* Toward Notion's breadcrumb bar: small and quiet, not a document title at
    word-processor scale. 14px is Notion's own, and inside this band it means 14px on
    screen — the counter-zoom above returns the header to nominal, so sizes written
