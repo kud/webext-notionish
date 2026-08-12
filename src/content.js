@@ -20,6 +20,33 @@ const OVERRIDDEN_FACES = [
 ]
 
 const FONT_STYLE_ID = "notionish-font"
+const UI_FONT_STYLE_ID = "notionish-ui-font"
+
+// Registers the bundled Inter under a name the document will never ask for, so the
+// chrome can be set in it while the canvas stays exactly as Docs painted it. That
+// distinction is the whole safety argument: applyFontOverride below aliases families
+// the *document* uses (Arial, Roboto), which is why it wrecks layout and ships off by
+// default. This one invents a family, so nothing in the document resolves to it and
+// there is nothing to misplace.
+//
+// Injected into the page rather than declared in content/*.css for the reason
+// established on 2026-08-11: Firefox injects content_scripts CSS at user origin,
+// where the page's font resolution never sees an @font-face. Same mechanism, opposite
+// risk profile.
+const applyUiFont = (enabled) => {
+  const existing = document.getElementById(UI_FONT_STYLE_ID)
+  if (!enabled) return existing?.remove()
+  if (existing) return
+
+  const url = browser.runtime.getURL("src/fonts/inter-variable.woff2")
+  const style = document.createElement("style")
+  style.id = UI_FONT_STYLE_ID
+  style.textContent =
+    `@font-face{font-family:"Notionish Inter";` +
+    `src:url("${url}") format("woff2-variations");` +
+    `font-weight:100 900;font-display:swap}`
+  document.documentElement.append(style)
+}
 
 // The one place JavaScript touches the document, and the reason is specific.
 // Docs paints body text into <canvas>, which no selector reaches — but canvas
@@ -195,6 +222,7 @@ const applySurface = (prefs) => {
     delete root.dataset.notionishFocus
   }
 
+  applyUiFont(enabled)
   applyFontOverride(enabled && prefs.fontOverride)
   applyZoom(zoomFor(root.dataset.notionishFocus))
   nudgeRelayout()

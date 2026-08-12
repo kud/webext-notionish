@@ -29,9 +29,14 @@
    NotionInter is a proprietary tuning of Inter, so Inter is the substitute Notion's
    own design system names. #37352f is Notion's product text colour. */
 html[data-notionish-surface][data-notionish-focus="on"] {
+  /* "Notionish Inter" is the bundled woff2, registered by src/content.js under a
+     name no document uses. Leading with plain Inter first would be a phantom: it is
+     not installed on most machines, so the stack silently fell through to
+     -apple-system and the header rendered in SF Pro while claiming to be Notion's
+     face. Bundled first, then the same fallbacks for the moment before it loads. */
   --notionish-font:
-    Inter, -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Helvetica,
-    Arial, sans-serif;
+    "Notionish Inter", Inter, -apple-system, BlinkMacSystemFont, system-ui,
+    "Segoe UI", Helvetica, Arial, sans-serif;
   --notionish-canvas: #ffffff;
   --notionish-surface: #ffffff;
   --notionish-fg: #37352f;
