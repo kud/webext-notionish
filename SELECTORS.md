@@ -8,9 +8,10 @@ a selector below stops matching, the corresponding rule is simply inert — the
 default is always "stock Google UI stays visible", never a hidden or broken page.
 See the comment header in each stylesheet for the same summary in-place.
 
-**Sheets was verified live on 2026-08-11** with `tools/selector-probe.js`, against a
-real spreadsheet in a signed-in session. Docs has **not** been — every Docs-only
-selector below is still an unverified guess.
+**Both surfaces were verified live on 2026-08-11** with `tools/selector-probe.js`,
+against a real document and a real spreadsheet in a signed-in session. The handful of
+selectors still carrying no evidence are listed under **Still unverified** below, and
+nowhere else.
 
 The verification pass mattered more than expected: two selectors carried as HIGH and
 LOW respectively matched **zero** nodes, and the header band turned out to be wider
@@ -118,5 +119,13 @@ contents, and read the three outputs:
 - **`furniture`** — visible chrome we are failing to hide, with real class names,
   excluding anything inside `.kix-page` so document content doesn't drown the signal.
 
-Update the confidence tiers above from what it reports. Nothing in this file has
-been confirmed against a live document yet.
+Update the confidence tiers above from what it reports.
+
+`tools/spacing-probe.js` is the second instrument, and answers a different question:
+not *which* elements are there, but *which element owns each gap*. Run it the same
+way. It reports the header-to-page distance as one number, the box model of every
+element between `html` and the page, and a ledger of vertical gaps that no element's
+own margin or padding explains — the ones contributed by a sibling or a pseudo-element,
+which the inspector will not hand you. Run it twice, once with focus mode on and once
+off (`Alt+Shift+N`): the first says what Notionish leaves behind, the second what
+Google shipped, and confusing the two sends you chasing a gap a rule already closed.

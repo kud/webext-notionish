@@ -14,14 +14,14 @@
 
 </div>
 
-Google Docs and Sheets are visually loud: a blue product bar, a dense Material toolbar, a ruler, a document tab strip, a right-hand app rail, and a grey backdrop with a paper drop-shadow around every page. Notion's appeal is the opposite — the page is nearly the only thing on screen. Notionish borrows that restraint for Docs and Sheets.
+Google Docs and Sheets are visually loud: a dense Material toolbar, two rulers, a left rail carrying the outline and tab strip, and a grey backdrop with a paper drop-shadow around every page. Notion's appeal is the opposite — the page is nearly the only thing on screen. Notionish borrows that restraint for Docs and Sheets.
 
 v1 is deliberately cosmetic and narrow: it hides the furniture around the document. It does not touch the document itself.
 
 ## 🌟 Features
 
-- 🙈 **Hides the furniture** — removes Docs' blue product bar, menu row, toolbar, ruler, document tab strip, and right-hand app rail.
-- 📊 **Sheets, decluttered** — hides the menu row, toolbar, and formula bar while leaving the grid untouched.
+- 🙈 **Hides the furniture** — removes Docs' menu row, toolbar, both rulers (there is a vertical one), and the left rail holding the outline and tab strip. The thin title band stays: a Notion page carries one strip of context too.
+- 📊 **Sheets, decluttered** — hides the menu row and toolbar while leaving the grid untouched.
 - 🎨 **Warm surface treatment** — swaps Google's grey backdrop and paper drop-shadow for a continuous, Notion-ish page.
 - ✍️ **Notion-ish chrome typography** — restyles the UI that survives (comment cards, dialogs, context menus) to match.
 - ⌨️ **One-key toggle** — `Alt+Shift+N`, or the popup button, brings the full Google UI back instantly without disabling the extension.
@@ -63,21 +63,22 @@ That split is deliberate: **if the JS never runs, or a selector stops matching a
 
 Surface detection is URL-based rather than host-based: `docs.google.com` hosts both Docs (`/document/*`) and Docs-embedded Sheets (`/spreadsheets/*`), while `sheets.google.com` is a separate host that redirects into the same app — so the host alone can't say which surface a tab is on. Slides and Drive itself are left untouched.
 
-Every selector the stylesheets rely on is tracked in [`SELECTORS.md`](SELECTORS.md) with a confidence tier — HIGH, MEDIUM, or LOW. The MEDIUM and LOW entries have not yet been verified against a live Doc or Sheet; they're sourced from general knowledge of Google's DOM rather than a live check.
+Every selector the stylesheets rely on is tracked in [`SELECTORS.md`](SELECTORS.md), tiered by evidence rather than by confidence: CONFIRMED (matched on a live document), CONFIRMED ABSENT (matched nothing, do not reinstate), or UNVERIFIED. The first pass through a running Doc and Sheet moved most entries, and not in the direction anyone expected — two selectors carried as high-confidence matched zero nodes.
 
 ## 🚫 Out of scope
 
 These are informed exclusions, not gaps:
 
-- **Document body text and cell contents.** Both are painted to `<canvas>`, so CSS cannot reach their typography, measure, or layout — this is a hard technical boundary, not an oversight.
+- **Document body text and cell contents.** Both are painted to `<canvas>`. The typography is reachable — canvas resolves font families through the same machinery as the DOM, so an `@font-face` injected at author origin does change what Docs paints — but it is not usable: Docs positions each formatting run at a coordinate derived from the original font's measurements, so any visually different substitute makes adjacent runs overlap. It ships as an option, off by default, documented as an experiment. Measure and layout stay out of reach outright.
+- **Page geometry.** Docs' own pageless mode is the only real fix for the page-shaped page, and it is a document setting stored server-side — turning it on changes the document for everyone who opens it. Not viable on a shared doc.
 - **A Notion-style Drive navigation sidebar.** Injecting one is a v2 project of its own; it needs Drive API OAuth.
 - **Google Slides.**
 - **Chrome / Chromium.** Firefox only — the manifest targets `browser_specific_settings.gecko` and ships no Chromium build.
 
 ## ⚠️ Known limitations
 
-- **The icon is a placeholder.** `src/icons/icon.svg` is a plain gradient square and must be replaced before any AMO submission.
-- **Selectors are unverified against a live session.** They're sourced from general knowledge of Google's DOM and long-standing Docs/Sheets conventions, not confirmed against a running Doc or Sheet this build cycle — see [`SELECTORS.md`](SELECTORS.md) for the full confidence breakdown before relying on this beyond casual daily use.
+- **Google will move these selectors eventually.** They're confirmed against a live Doc and Sheet, not guaranteed against next quarter's redesign. When a piece of furniture reappears, that's the signal — run `tools/selector-probe.js` and re-tier [`SELECTORS.md`](SELECTORS.md) from what it reports rather than guessing at a new class name.
+- **The Sheets formula bar is still showing.** Both guessed selectors for it matched nothing on a live spreadsheet, and its real one is not yet known.
 
 ## 🔧 Development
 
@@ -88,17 +89,21 @@ npm install
 npm run dev
 ```
 
-`npm run dev` runs `web-ext run --firefox=nightly`, which launches Firefox Nightly with the extension already loaded and live-reloaded on file changes. For a one-off manual load instead, use `about:debugging#/runtime/this-firefox` → **Load Temporary Add-on** → `manifest.json`.
+`npm run dev` launches Firefox Nightly with the extension already loaded and live-reloaded on file changes, against a persistent profile at `~/.cache/notionish-dev-profile`. **Sign into Google there once** — the profile is kept between runs, so every later run opens on a real signed-in session. That matters more than it sounds: there is nothing to test this extension against without one, and a throwaway profile is why the keyboard shortcut went two build cycles without anyone actually pressing it. Use `npm run dev:clean` for a fresh temporary profile when you want to see a first-install experience.
+
+The dev profile is deliberately its own, not a copy of your daily one: your real profile is never opened by tooling, and the 800MB copy that copying it would cost on every launch never happens.
+
+For a one-off manual load instead, use `about:debugging#/runtime/this-firefox` → **Load Temporary Add-on** → `manifest.json`. Temporary add-ons do **not** hot-reload — `about:debugging` needs an explicit **Reload** after every change, which `npm run dev` handles for you.
 
 ```
 src/
-├── background.js          # MV2 background script — install defaults, command handling
+├── background.js          # MV2 background script — keyboard command relay
 ├── content.js              # runs at document_start, resolves surface, tags <html>
 ├── content/
 │   ├── shared.css          # rules shared by Docs and Sheets
 │   ├── docs.css             # Docs-specific hiding/restyling
 │   └── sheets.css           # Sheets-specific hiding/restyling
-├── icons/icon.svg           # placeholder — replace before AMO submission
+├── icons/icon.svg           # the extension mark, single SVG at every size
 ├── lib/storage.js           # browser.storage.sync helpers (popup/options only)
 ├── options/                 # options page
 └── popup/                   # toolbar popup
@@ -106,11 +111,14 @@ src/
 
 | Script            | What it does                                                                  |
 | ----------------- | ----------------------------------------------------------------------------- |
-| `npm run dev`     | Launches Firefox Nightly with the extension loaded and watched                |
+| `npm run dev`       | Launches Firefox Nightly on the persistent dev profile, extension loaded and watched |
+| `npm run dev:clean` | Same, but on a fresh throwaway profile — no Google session                          |
 | `npm run lint`    | Runs `web-ext lint`                                                           |
 | `npm run build`   | Builds a signable package into `web-ext-artifacts/`                           |
 | `npm run version` | Syncs `manifest.json`'s version from `package.json` (used by release tooling) |
 | `npm run publish` | Builds and opens the AMO Developer Hub for a first manual submission          |
+
+`tools/` holds the two page-console probes: `selector-probe.js` answers *which elements are there*, `spacing-probe.js` answers *which element owns each gap*. Neither ships in the package. Paste one into the page console on a real Doc — see [`SELECTORS.md`](SELECTORS.md) for how to read the output.
 
 Both `src/background.js` and `src/content.js` load as classic (non-module) scripts under Manifest V2, so they duplicate `DEFAULT_PREFS` from `src/lib/storage.js` rather than importing it — `storage.js` itself is only imported by the popup and options page, which do run as ES modules.
 
