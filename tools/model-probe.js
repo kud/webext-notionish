@@ -107,6 +107,19 @@
     .map((e) => e.s)
     .join("")
 
+  // The model's index space starts at 1, not 0 — the sole "is" entry carries
+  // "ibi": 1, and every si/ei is stated in those terms with ei inclusive. So a span
+  // maps onto a JS string as slice(si - 1, ei), and getting it wrong costs exactly
+  // one character at the front of every bold run, every link, every heading.
+  //
+  // Worth knowing how this was found: the first run of this probe printed the bold
+  // runs as "rocess", "alance Transfer", "dd Transfer Pairs". Had it printed only
+  // counts — 7 bold runs, 1 link, as a summary table does by default — the offset
+  // would have been invisible here and would have surfaced later as a renderer that
+  // bolds from the second letter of every word it is asked to bold. Print the text,
+  // not the tally.
+  const sliceModel = (from, to) => text.slice(from - 1, to)
+
   const styleSpans = entries.filter((e) => e.ty === "as")
   const byStyle = Object.entries(
     styleSpans.reduce((acc, e) => ({ ...acc, [e.st]: (acc[e.st] ?? 0) + 1 }), {}),
@@ -114,11 +127,16 @@
 
   const links = styleSpans
     .filter((e) => e.sm?.lnks_link?.ulnk_url)
-    .map((e) => ({ from: e.si, to: e.ei, url: e.sm.lnks_link.ulnk_url }))
+    .map((e) => ({
+      from: e.si,
+      to: e.ei,
+      text: sliceModel(e.si, e.ei),
+      url: e.sm.lnks_link.ulnk_url,
+    }))
 
   const bold = styleSpans
     .filter((e) => e.sm?.ts_bd === true && e.sm?.ts_bd_i === false)
-    .map((e) => ({ from: e.si, to: e.ei, text: text.slice(e.si, e.ei) }))
+    .map((e) => ({ from: e.si, to: e.ei, text: sliceModel(e.si, e.ei) }))
 
   const images = entries
     .filter((e) => e.ty === "ae" && e.et === "inline")
@@ -150,6 +168,14 @@
   console.table(images)
   console.table(placements)
   console.log("first 600 chars of document text:\n", text.slice(0, 600))
+
+  // Inline images occupy one character in the text — a literal "*" at the index each
+  // "te" entry names. A renderer has to replace those rather than print them, and
+  // has to do it before any span offsets are recomputed against its own output.
+  console.log(
+    "entity placeholders (should each read \"*\"):",
+    placements.map((p) => JSON.stringify(sliceModel(p.atIndex, p.atIndex))),
+  )
 
   // Left on the window deliberately. The summary above answers "did it work"; the
   // next question is always "what does <this bit> look like", and that wants poking
