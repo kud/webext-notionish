@@ -47,6 +47,28 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"]
   zoom: var(--notionish-header-scale, 1);
 }
 
+/* The header row is built from inline-blocks, which align on the baseline — so each
+   item's vertical position is a function of its own font metrics and box height
+   rather than of the row. Measured 2026-08-12: the right-hand cluster sits uniformly
+   12px below the band's centre while the title sits at 5, a 7px step that reads as
+   the title floating above everything beside it.
+
+   Baseline alignment is also why this appeared when the typeface changed and not
+   before. Inter's metrics differ from Google Sans', so the title's baseline moved
+   and took nothing else with it.
+
+   vertical-align rather than a nudge: a margin would need a magic number per element,
+   correct only for this font at this size. And unlike the display: flex attempt this
+   replaces — which collapsed the whole band, since #docs-header-container has
+   absolutely-positioned children whose containing block that changed — vertical-align
+   is a local property. It adjusts each element within the layout Docs already has,
+   rather than replacing that layout with a different algorithm. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-header-container .goog-inline-block,
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input-wrapper,
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input-label {
+  vertical-align: middle !important;
+}
+
 /* The rename affordance. Measured live 2026-08-12: input.docs-title-input carries a
    1px border at 4px radius which is *transparent at rest* and coloured in by Docs on
    hover and focus. Against the header's usual pale blue-grey that reads as a soft
