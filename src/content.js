@@ -161,13 +161,22 @@ const applyZoom = async (wanted) => {
   // part that should not grow. It is chrome, and a title bar rendered at 130% is
   // heavy in precisely the way this extension exists to fix.
   //
-  // Unlike the document, the header is DOM, so it can be scaled back by the exact
-  // reciprocal. Computed here rather than as calc(1 / var(…)) in the stylesheet: CSS
-  // cannot read a preference, and handing it a plain number avoids depending on
-  // calc() being accepted where a <number> is expected.
+  // Unlike the document, the header is DOM, so it can be scaled back. Computed here
+  // rather than as calc() in the stylesheet: CSS cannot read a preference, and a
+  // plain number avoids depending on calc() being accepted where a <number> is
+  // expected.
+  //
+  // Partial compensation — the square root rather than the reciprocal. Cancelling the
+  // zoom exactly pins the band at 100% while the document runs at 130%, and the
+  // mismatch reads as a header belonging to a different, smaller window. Meeting in
+  // the geometric middle keeps the chrome visibly lighter than the document without
+  // divorcing it: at 130% the band lands near 114%.
+  //
+  // To go back to a band that never grows, drop the sqrt. To let it track the
+  // document, remove the property and the rule in docs.css that consumes it.
   document.documentElement.style.setProperty(
     "--notionish-header-scale",
-    String(1 / factor),
+    String(1 / Math.sqrt(factor)),
   )
 
   return browser.runtime
