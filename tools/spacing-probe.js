@@ -51,7 +51,10 @@
     return {
       el: label(el),
       top: Math.round(r.top),
+      left: Math.round(r.left),
+      width: Math.round(r.width),
       height: Math.round(r.height),
+      cssLeft: cs.left === "auto" ? "auto" : px(cs.left),
       marginTop: px(cs.marginTop),
       paddingTop: px(cs.paddingTop),
       borderTop: px(cs.borderTopWidth),

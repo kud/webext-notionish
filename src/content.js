@@ -107,6 +107,21 @@ let currentPrefs = DEFAULT_PREFS
 const zoomFor = (focus) =>
   surface === "docs" && focus === "on" ? currentPrefs.zoomFactor : 1
 
+// Docs centres the page by computing a left offset in JavaScript and writing it
+// onto .kix-rotatingtilemanager-content, rather than by any CSS we can override —
+// the page itself is position:absolute at left:5px inside it. That calculation happens once,
+// against the widths present at the time, and hiding the left rail afterwards frees
+// space Docs never recounts: measured 2026-08-12 at 301px left against 186px right
+// in a 1303px viewport, which is half a rail's width off centre.
+//
+// The gate is set asynchronously — storage.sync.get has to resolve first — so our
+// hiding always lands after Docs has laid out, whatever the timing. Docs recomputes
+// on window resize, so this says one happened. A synthetic event rather than a real
+// size change because there is nothing to actually resize; ResizeObserver would not
+// see this, but Docs is not using one here or the rail's disappearance would have
+// triggered it already.
+const nudgeRelayout = () => window.dispatchEvent(new Event("resize"))
+
 const applySurface = (prefs) => {
   currentPrefs = prefs
   const root = document.documentElement
@@ -127,6 +142,7 @@ const applySurface = (prefs) => {
 
   applyFontOverride(enabled && prefs.fontOverride)
   applyZoom(zoomFor(root.dataset.notionishFocus))
+  nudgeRelayout()
 }
 
 // Only wire up listeners when we're actually on a Docs/Sheets document — nothing to
@@ -153,6 +169,9 @@ if (surface) {
     root.dataset.notionishFocus = focus
     // Focus off means the full Google UI is back, and a Doc at 130% is not that.
     applyZoom(zoomFor(focus))
+    // Toggling puts the rail back, which frees and reclaims the same width — so the
+    // recentring is owed in both directions.
+    nudgeRelayout()
     return Promise.resolve({ focus })
   })
 }
