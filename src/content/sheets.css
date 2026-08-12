@@ -3,30 +3,34 @@
    attribute pair is never set, none of this fires and stock Google Sheets renders
    untouched — see src/content.js for how it's set, and SELECTORS.md for the full
    confidence tiering of every selector below. Summary:
-     HIGH   #docs-titlebar, #docs-menubar, #docs-toolbar-wrapper, .waffle
-     LOW    #t-formula-bar-container, .formula-bar-container
-   .waffle is the known-stable grid-canvas anchor from the project brief — it is
-   never hidden, only used as a scoping reference below. */
+     CONFIRMED  #docs-titlebar, #docs-menubar, #docs-toolbar-wrapper,
+                #docs-header-container, #waffle-grid-container
+   #waffle-grid-container is the grid anchor — never hidden, reference only. The
+   brief called it .waffle; a live probe found no such element on a 2026 Sheet. */
 
 html[data-notionish-surface="sheets"][data-notionish-focus="on"] {
-  background: #fffefc;
+  background: var(--notionish-canvas);
 }
 
-html[data-notionish-surface="sheets"][data-notionish-focus="on"] #docs-titlebar,
+/* The header band (#docs-header-container, holding #docs-titlebar) is KEPT, matching
+   the Docs surface — a Notion page carries one thin strip of context at the top, and
+   the title bar is the closest equivalent.
+
+   What goes is the row beneath: menus and toolbar. Hide the *row* (#docs-bars), not
+   just its contents — hiding #docs-menubar and #docs-toolbar-wrapper while their
+   container stays leaves the row's height behind with the search pill and collapse
+   chevron stranded in it. The inner ids stay as independent fallbacks. */
+html[data-notionish-surface="sheets"][data-notionish-focus="on"] #docs-bars,
+html[data-notionish-surface="sheets"][data-notionish-focus="on"] #docs-menubars,
 html[data-notionish-surface="sheets"][data-notionish-focus="on"] #docs-menubar,
 html[data-notionish-surface="sheets"][data-notionish-focus="on"]
   #docs-toolbar-wrapper {
   display: none !important;
 }
 
-/* Formula bar — LOW confidence selectors, unverified live. Two alternate forms are
-   listed to raise the odds of a match; if neither hits, the formula bar simply
-   stays visible, which is a no-op, not a break. */
-html[data-notionish-surface="sheets"][data-notionish-focus="on"]
-  #t-formula-bar-container,
-html[data-notionish-surface="sheets"][data-notionish-focus="on"]
-  .formula-bar-container {
-  display: none !important;
-}
+/* The formula bar had two guessed selectors here, #t-formula-bar-container and
+   .formula-bar-container. A live probe found neither on a 2026 Sheet — both matched
+   zero nodes — so they are gone rather than left in place looking like coverage.
+   The real selector is still unknown; tools/selector-probe.js hunts for it. */
 
-/* .waffle (the grid) is deliberately untouched — no rule targets it. */
+/* #waffle-grid-container (the grid) is deliberately untouched — no rule targets it. */

@@ -1,46 +1,87 @@
 /* Notionish — Google Docs focus mode
    Gate: html[data-notionish-surface="docs"][data-notionish-focus="on"]. If that
    attribute pair is never set, none of this fires and stock Google Docs renders
-   untouched — see src/content.js for how it's set, and SELECTORS.md for the full
-   confidence tiering of every selector below. Summary:
-     HIGH   #docs-titlebar, #docs-menubar, #docs-toolbar-wrapper, .kix-appview-editor
-     MEDIUM .docs-ruler-container
-     LOW    .docs-tabbar-container, .docs-gm-addon-bar
-   LOW-confidence rules are deliberately narrow and additive: if the selector is
-   wrong, that one piece of chrome just stays visible — never a hidden document. */
+   untouched — see src/content.js for how it's set, and SELECTORS.md for the
+   evidence behind every selector below. Verified live on 2026-08-11.
+
+   Restyling rules carry !important for the same reason hiding rules do. Without it
+   Google's own stylesheet wins on specificity and the rule no-ops in silence —
+   which looks exactly like the selector being wrong, and cost a round of debugging
+   when the backdrop stayed Google-blue with no error anywhere. */
 
 html[data-notionish-surface="docs"][data-notionish-focus="on"] {
-  background: #fffefc;
+  background: var(--notionish-canvas);
 }
 
-html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-titlebar,
+/* The header band (#docs-header-container, holding #docs-titlebar) is deliberately
+   KEPT. A Notion page is not a bare document — it carries one thin strip of context
+   at the top, and the Docs title bar is the closest equivalent.
+
+   What goes is the row beneath it: menus and toolbar. Hide the *row* (#docs-bars),
+   not just its contents. Hiding #docs-menubar and #docs-toolbar-wrapper while their
+   container stays leaves the row's height behind with the search pill and the
+   collapse chevron stranded in it — visibly broken in a way that hiding either the
+   whole band or nothing at all never is. The inner ids are kept as fallbacks: they
+   fail independently, so a renamed container still empties the row. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-bars,
+html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-menubars,
 html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-menubar,
 html[data-notionish-surface="docs"][data-notionish-focus="on"]
-  #docs-toolbar-wrapper,
-html[data-notionish-surface="docs"][data-notionish-focus="on"]
-  .docs-ruler-container {
+  #docs-toolbar-wrapper {
   display: none !important;
 }
 
-/* Document tab strip (multi-tab-per-document) and the right-hand app rail
-   (Explore / add-ons icons) — both LOW confidence, see header comment. */
+/* Both rulers — there is a vertical one down the left edge as well as the familiar
+   horizontal one. .docs-ruler is the class they share; #kix-horizontal-ruler-container
+   is the 16px band the horizontal ruler sits in, which keeps its height if only the
+   ruler itself is hidden. The brief's .docs-ruler-container matched nothing. */
 html[data-notionish-surface="docs"][data-notionish-focus="on"]
-  .docs-tabbar-container,
+  #kix-horizontal-ruler-container,
 html[data-notionish-surface="docs"][data-notionish-focus="on"]
-  .docs-gm-addon-bar {
+  #kix-vertical-ruler,
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-ruler,
+/* A sibling of the vertical ruler rather than part of it — it carries neither the
+   .docs-ruler class nor the #kix-vertical-ruler id, so hiding both of those left it
+   drawing a thin 16px line down the left edge on its own. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"]
+  .docs-vertical-ruler-active-indicators {
   display: none !important;
 }
 
-/* .kix-appview-editor is the known-stable editing-canvas anchor — used here only
-   to recolour the backdrop behind the page, never hidden. */
+/* The left rail — document outline and the per-document tab strip, which are one
+   container in 2026 Docs. Both .docs-tabbar-container and .docs-gm-addon-bar were
+   guesses at a separate top strip and a right-hand rail; neither exists. */
 html[data-notionish-surface="docs"][data-notionish-focus="on"]
-  .kix-appview-editor {
-  background: #fffefc;
+  .left-sidebar-container {
+  display: none !important;
 }
 
-/* Page drop-shadow and border removed so the document reads as continuous rather
-   than a sheet of paper floating on a grey backdrop. */
-html[data-notionish-surface="docs"][data-notionish-focus="on"] .kix-page {
+/* Backdrop behind the page. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"]
+  .kix-appview-editor,
+html[data-notionish-surface="docs"][data-notionish-focus="on"]
+  .kix-appview-editor-container {
+  background: var(--notionish-canvas) !important;
+}
+
+/* The page frame, so the document reads as continuous rather than as sheets of
+   paper stacked on a backdrop. The brief called this .kix-page; the live class is
+   .kix-page-paginated.
+
+   outline is the one that actually draws it. Measured 2026-08-11: the element
+   computes to `border: 0px none` and `box-shadow: none` while still showing a
+   visible frame — so both rules here were no-ops from the start, and the fix was
+   never going to arrive by adding another !important to either. Outline sits
+   outside the border edge, takes no part in layout, and is untouched by
+   `border: none`. The other two stay only as cheap insurance if Google switches
+   which property it uses.
+
+   The page itself computes to a transparent background, so it takes its white from
+   whatever sits behind — which is why the backdrop rule above has to be white for
+   the page boundary to disappear rather than merely lose its edge. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"]
+  .kix-page-paginated {
+  outline: none !important;
   box-shadow: none !important;
   border: none !important;
 }

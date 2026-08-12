@@ -1,9 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#4A6CF7" />
-      <stop offset="1" stop-color="#2B44C2" />
-    </linearGradient>
-  </defs>
-  <rect width="96" height="96" rx="22" fill="url(#bg)" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" role="img" aria-label="Notionish">
+  <!-- The mark says what the extension does rather than what it resembles: a page,
+       with the furniture above it dissolving. Deliberately not a stylised N in a
+       page frame — that is Notion's own mark, and the AMO listing already has a
+       trademark question hanging over the name without the icon adding to it.
+
+       Sized to survive 16px, where Firefox actually draws this. The two faded bars
+       are the first thing to disappear at that size, which is the correct failure:
+       what is left still reads as a page. -->
+  <rect width="96" height="96" rx="22" fill="#37352f" />
+
+  <!-- The chrome being removed: two bars sharing the page's left edge, fading out
+       upward. Aligned to the page rather than centred — a toolbar sits above a
+       document, it does not float over it. -->
+  <rect x="22" y="17" width="52" height="6" rx="3" fill="#ffffff" opacity="0.20" />
+  <rect x="22" y="29" width="33" height="6" rx="3" fill="#ffffff" opacity="0.40" />
+
+  <!-- The page that remains. -->
+  <rect x="22" y="41" width="52" height="38" rx="7" fill="#ffffff" />
+  <rect x="31" y="53" width="34" height="5" rx="2.5" fill="#37352f" opacity="0.85" />
+  <rect x="31" y="64" width="22" height="5" rx="2.5" fill="#37352f" opacity="0.5" />
 </svg>
