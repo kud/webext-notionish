@@ -64,10 +64,19 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"]
    is a local property. It adjusts each element within the layout Docs already has,
    rather than replacing that layout with a different algorithm. */
 html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-header-container .goog-inline-block,
+html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-titlebar > *,
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-branding-icon,
 html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input-wrapper,
 html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input-label {
   vertical-align: middle !important;
 }
+
+/* The logo is the tallest thing in the row, so it decides where the middle is — and
+   an element aligned to the middle of a line whose height it sets is centred on
+   itself by definition. What breaks that is a *wrapper* left on the baseline: the
+   logo can be perfectly middle-aligned inside a box that is not, and then the whole
+   group hangs off the wrapper's baseline instead. Hence the row above reaching the
+   titlebar's own children, not only the inline-blocks inside them. */
 
 /* The rename affordance. Measured live 2026-08-12: input.docs-title-input carries a
    1px border at 4px radius which is *transparent at rest* and coloured in by Docs on

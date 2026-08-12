@@ -40,8 +40,26 @@
     .filter((el) => el.getBoundingClientRect().width <= bandWidth)
     .sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left)
 
+  // Named anchors are reported whether or not they are leaves. The leaf filter earns
+  // its place — a container's box spans its children, so reporting both fills the
+  // table with overlapping rows — but it also hides exactly the containers whose
+  // alignment is in question. Both, then: leaves for the gap ledger, plus these by
+  // name.
+  const ANCHORS = [
+    ".docs-branding-icon",
+    ".docs-title-input-wrapper",
+    ".docs-title-input-label",
+    "#docs-titlebar",
+    ".docs-titlebar-buttons",
+  ]
+  const anchors = ANCHORS.flatMap((selector) =>
+    [...header.querySelectorAll(selector)].filter(visible),
+  )
+
   let previous = null
-  const row = leaves.map((el) => {
+  const row = [...new Set([...leaves, ...anchors])]
+    .sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left)
+    .map((el) => {
     const r = el.getBoundingClientRect()
     const cs = getComputedStyle(el)
     const parent = getComputedStyle(el.parentElement)
