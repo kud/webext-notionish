@@ -139,41 +139,13 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"] #scb-quick-action
   background-color: rgba(55, 53, 47, 0.04) !important;
 }
 
-/* The rename affordance. Measured live 2026-08-12: input.docs-title-input carries a
-   1px border at 4px radius which is *transparent at rest* and coloured in by Docs on
-   hover and focus. Against the header's usual pale blue-grey that reads as a soft
-   outline; against the white band this extension puts behind it, the same border
-   reads as a hard box drawn around the title.
+/* Rename mode is deliberately unstyled. Docs' own hover border, focus ring and box
+   are left exactly as they are: the point of the title is that it can be edited, and
+   every attempt to dress the state it enters while being edited cost more than it
+   returned — a hover fill, a suppressed border, a focus ring that turned out to fire
+   on click, and a wrapper reached through :has(). All removed.
 
-   Not a bug we introduced, and still ours to fix — the border was tuned for a
-   background we replaced. Swapped for Notion's idiom for the identical affordance:
-   no outline, a faint fill on hover.
-
-   The keyboard focus ring is deliberately kept rather than folded into the fill. A
-   background tint is a perfectly good signal for someone whose pointer is already on
-   the target and a weak one for someone arriving by Tab, and :focus-visible is
-   exactly the distinction. */
-/* The band renders two-tone: Docs' pale #f9fbfd survives on the left cluster and the
-   right one, while the container between them is transparent and shows the white
-   canvas through. Not a seam Docs has — its header is that colour end to end — but
-   one this extension creates by repainting everything behind it.
-
-   Painted white rather than cleared, and that distinction is the fix. transparent
-   removes only this element's own colour and lets whatever sits behind it through —
-   which is why two rounds of clearing never touched the left-hand tint: nothing
-   inside the header was painting it, so there was nothing there to clear. Covering
-   works without having to identify the ancestor at all.
-
-   .docs-titlebar-buttons is named because it genuinely does paint its own
-   rgb(248, 250, 253) at depth 3, confirmed by tools/header-probe.js. The colours
-   deliberately left alone are all deeper — the Share pill's #c2e7ff at depth 5, the
-   external badge's amber at 7, the Gemini entry point's blue at 9. */
-html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-header-container,
-html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-titlebar-buttons {
-  background-color: var(--notionish-canvas) !important;
-}
-
-/* The title keeps Docs' own font, and that is a decision rather than an oversight.
+   The title keeps Docs' own font, and that is a decision rather than an oversight.
 
    Inter was applied here with the rest of the header and cost three separate fixes:
    the inline width Docs measured in Google Sans stopped matching, so the title ran
@@ -210,34 +182,6 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input
      Under border-box the same declaration would eat into it and cause the clipping
      it was added to fix. */
   padding: 2px 6px !important;
-}
-
-/* The rename affordance is drawn by a wrapper as well as the input itself, and the
-   wrapper only takes its border once the title is being edited — a state that ends
-   the moment you click into the console to inspect it, which is why the element
-   query that found .docs-title-input never saw this one.
-
-   :has() rather than a guessed class name. The relationship is what we actually know
-   — "whatever element wraps the title input" — and naming it from memory is how
-   .waffle and .kix-page got into this codebase. */
-html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-header-container *:has(> .docs-title-input) {
-  border-color: transparent !important;
-  box-shadow: none !important;
-}
-
-/* No focus ring on this one, and the reasoning that put one here was wrong.
-   :focus-visible was chosen to keep a ring for keyboard users while sparing pointer
-   users — but a text input matches :focus-visible on *every* focus, mouse included,
-   because the spec treats anything accepting keyboard input as always warranting the
-   ring. So the rule fired on click and drew a hard 2px box: precisely what removing
-   Docs' own border was meant to avoid.
-
-   Dropping it costs nothing here, unlike on a button. A focused text field shows a
-   blinking caret in it, which is a stronger and more specific signal than an outline
-   and is present however the focus arrived. */
-html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input:focus,
-html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input:focus-visible {
-  outline: none !important;
 }
 
 /* Both rulers — there is a vertical one down the left edge as well as the familiar
