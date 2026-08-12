@@ -25,9 +25,17 @@
   // Leaves rather than every node. A container's rect spans its children, so
   // reporting both produces a list where half the entries overlap the other half and
   // no gap in it means anything.
+  // Sprite-sheet icons report the entire sheet as their box — 7692px wide, starting
+  // thousands of pixels off-screen left — so a gap measured either side of one is
+  // meaningless, and a table full of them buries the handful of rows that are not.
+  // Excluded by shape rather than by class name: anything wider than the header it
+  // sits in is not a thing in the header's layout.
+  const bandWidth = header.getBoundingClientRect().width
+
   const leaves = [...header.querySelectorAll("*")]
     .filter(visible)
     .filter((el) => ![...el.children].some(visible))
+    .filter((el) => el.getBoundingClientRect().width <= bandWidth)
     .sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left)
 
   let previous = null

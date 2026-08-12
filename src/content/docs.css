@@ -61,6 +61,31 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"]
    background tint is a perfectly good signal for someone whose pointer is already on
    the target and a weak one for someone arriving by Tab, and :focus-visible is
    exactly the distinction. */
+/* Toward Notion's breadcrumb bar: small and quiet, not a document title at
+   word-processor scale. 14px is Notion's own, and inside this band it means 14px on
+   screen — the counter-zoom above returns the header to nominal, so sizes written
+   here are read at face value rather than multiplied by the zoom.
+
+   THE TITLE IS RENDERED TWICE. input.docs-title-input is the field you type into;
+   span#docs-title-input-label-inner sits on top of it displaying the same string.
+   They coincide exactly while they share a font-size, which is why nobody notices —
+   and a first attempt at this styled only the input, which slid the two out of
+   register and showed both copies at once, superimposed at different sizes.
+
+   Both are styled here for that reason, and the pair also explains the width: Docs
+   measures the label span and sizes the input from it. Measured 2026-08-12 — label
+   182 + 6 + 6 padding + borders = the input's 196. Scale both together and Docs'
+   own measurement keeps the box honest, which is why this needs no field-sizing
+   trick and no override of Docs' inline width. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input,
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input-label-inner,
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input-label {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: var(--notionish-fg) !important;
+  font-family: var(--notionish-font) !important;
+}
+
 html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input:hover,
 html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input:focus {
   border-color: transparent !important;

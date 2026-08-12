@@ -61,6 +61,14 @@ Docs was verified live the same day, against a real document:
 - `.kix-appview-editor` — present. Also `.kix-appview-editor-container`, its parent.
 - `.kix-page-paginated` — a document page. Carries `canvas-first-page` and
   `kix-page-canvas-compact-mode` alongside.
+- `.docs-title-input-label-inner` (in `.docs-title-input-label`) — **the title's
+  twin.** A span displaying the same string, stacked exactly on the input. Confirmed
+  2026-08-12 by `tools/header-probe.js`, which reports every visible element in the
+  band and so found an element nobody would have thought to look for: two entries,
+  same text, 5px apart. Docs measures this span and sizes the input from it
+  (182 + 6 + 6 padding + borders = 196). **Any typography rule aimed at the title
+  must name both**, or they slide out of register and the title renders twice at
+  different sizes.
 - `.docs-title-input` — the document title, an `<input>` inside the header band.
   Confirmed 2026-08-12 by querying every bordered element in `#docs-header-container`
   rather than by guessing at a name. Carries a 1px border at 4px radius which is
