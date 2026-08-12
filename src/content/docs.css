@@ -61,6 +61,23 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"]
    background tint is a perfectly good signal for someone whose pointer is already on
    the target and a weak one for someone arriving by Tab, and :focus-visible is
    exactly the distinction. */
+/* The band renders two-tone: Docs' pale #f9fbfd survives on the left cluster and the
+   right one, while the container between them is transparent and shows the white
+   canvas through. Not a seam Docs has — its header is that colour end to end — but
+   one this extension creates by repainting everything behind it.
+
+   Cleared by depth rather than by naming the two clusters. They are outer containers,
+   and the colours worth keeping — the Share pill's blue, the avatar, the badges —
+   are all nested deeper than this reaches. Naming them would mean guessing two class
+   names to fix a problem that is really "the wrappers, whatever they are called",
+   and today has been a long argument against that. If a tint survives at depth 3,
+   npm run probe:header lists every painted element in the band with its depth. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-header-container,
+html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-header-container > *,
+html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-header-container > * > * {
+  background-color: transparent !important;
+}
+
 /* Toward Notion's breadcrumb bar: small and quiet, not a document title at
    word-processor scale. 14px is Notion's own, and inside this band it means 14px on
    screen — the counter-zoom above returns the header to nominal, so sizes written
