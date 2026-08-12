@@ -65,6 +65,13 @@ browser.commands.onCommand.addListener(async (command) => {
       // "No receiving end" is expected on any tab without the content script. Anything
       // else — a missing host permission, say — is a real fault, and swallowing it
       // silently is why the shortcut appeared to do nothing at all.
-      if (!/receiving end/i.test(error?.message ?? "")) console.error(error)
+      //
+      // Prefixed like every other line we emit, and for a reason beyond tidiness: the
+      // Browser Console carries all of Firefox, so it is read through a filter or not
+      // at all. An unprefixed error is not merely hard to find — filtering on
+      // "Notionish" actively hides it, and a filter that returns nothing reads as
+      // "no faults" rather than "the one fault worth seeing is spelled differently".
+      if (!/receiving end/i.test(error?.message ?? ""))
+        console.error("Notionish: toggle failed —", error)
     })
 })
