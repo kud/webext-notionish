@@ -87,13 +87,18 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-title-input
    ordinary buttons rather than the title's hidden-twin pair, so paint is safe here
    in a way it was not there.
 
-   Selectors confirmed live 2026-08-12 by tools/header-probe.js: the pill is
-   .jfk-button at depth 5 painting rgb(194, 231, 255), the dropdown half is
-   #scb-quick-actions-menu-button beside it. The avatar and the Gemini mark keep
-   their colour deliberately — one is a photo and the other is a product mark, and
-   draining either reads as broken rather than restrained. */
-html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-titlebar-buttons .jfk-button,
-html[data-notionish-surface="docs"][data-notionish-focus="on"] #scb-quick-actions-menu-button {
+   Scoped to :not(.jfk-button-action), which leaves the Share control alone. Two
+   attempts at restyling it put a border on the caret half and none on the pill, and
+   squared off an end that should be round — the visible pill is not the element
+   .jfk-button reaches, and finding the one it is would mean another probe run to fix
+   a control that looked fine to begin with. Share is the primary action here and is
+   entitled to be the loud thing; it was the row of icon buttons beside it that
+   needed quieting.
+
+   The avatar and the Gemini mark keep their colour for the same reason — one is a
+   photo, the other a product mark, and draining either reads as broken rather than
+   restrained. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-titlebar-buttons .jfk-button:not(.jfk-button-action) {
   background-color: transparent !important;
   color: var(--notionish-fg) !important;
   /* Not --notionish-border (#e6e6e6). That reads perfectly well as the outline of a
@@ -105,24 +110,8 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"] #scb-quick-action
   box-shadow: none !important;
 }
 
-html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-titlebar-buttons .jfk-button:hover,
-html[data-notionish-surface="docs"][data-notionish-focus="on"] #scb-quick-actions-menu-button:hover {
+html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-titlebar-buttons .jfk-button:not(.jfk-button-action):hover {
   background-color: rgba(55, 53, 47, 0.06) !important;
-}
-
-/* The split button is two halves of one control. Dropping the shared edge entirely
-   let the two halves read as separate things once the fill was gone — the fill was
-   what held them together. Kept as a hairline divider instead, lighter than the
-   outline so it reads as an internal seam rather than a second border. */
-html[data-notionish-surface="docs"][data-notionish-focus="on"] #scb-quick-actions-menu-button {
-  border-left: 1px solid rgba(55, 53, 47, 0.1) !important;
-}
-
-/* The Share glyph is a sprite tinted by background-color, so it takes the rule above
-   and vanishes. Restored explicitly rather than excluded from the selector, which
-   would leave the pill's own fill behind. */
-html[data-notionish-surface="docs"][data-notionish-focus="on"] .docs-titlebar-buttons .scb-icon {
-  background-color: rgb(0, 74, 119) !important;
 }
 
 /* The rename affordance. Measured live 2026-08-12: input.docs-title-input carries a
