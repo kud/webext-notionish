@@ -1,188 +1,27 @@
-/* popup.css — theme-aware styling, following the kud webextension convention:
-   light palette by default, swapped under prefers-color-scheme: dark, using
-   Firefox's own UI colours so the popup blends into the browser chrome. */
+/* Notionish — popup identity.
+ *
+ * Everything shared lives in the vendored design system at src/vendor/
+ * (@kud/webext-ui). Re-sync with:
+ *   npx @kud/webext-ui@latest sync src/vendor/
+ *
+ * Note this is the popup only. src/content/ deliberately does not adopt the
+ * system: it restyles Google's own DOM and needs to win the cascade rather
+ * than be isolated, and its --notionish-* tokens impersonate Notion's palette
+ * on purpose.
+ */
 
 :root {
-  --bg: #ffffff;
-  --fg: #1c1b22;
-  --muted: #5b5b66;
-  --faint: #8f8f9d;
-  --border: #ededf0;
   --accent: #37352f;
-  --accent-fg: #ffffff;
-  color-scheme: light dark;
+  --accent-fg: #ffffff; /* 12.26:1 on --accent */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #1c1b22;
-    --fg: #fbfbfe;
-    --muted: #b1b1bd;
-    --faint: #8f8f9d;
-    --border: #2b2a33;
     --accent: #e3e1dc;
-    --accent-fg: #1c1b22;
+    --accent-fg: #1c1b22; /* 13.07:1 on --accent */
   }
 }
 
-* {
-  box-sizing: border-box;
-}
-
-body {
-  width: 260px;
-  margin: 0;
-  padding: 16px;
-  background: var(--bg);
-  color: var(--fg);
-  font:
-    13px/1.4 system-ui,
-    -apple-system,
-    "Segoe UI",
-    sans-serif;
-}
-
-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--faint);
-  flex: none;
-}
-
-/* Filled when on, a hollow ring when off. The two states have to differ in shape,
-   not only in fill — two dots of the same size separated by colour alone are one
-   dot to a colourblind reader, and this popup's whole job is reporting state. */
-.dot[data-tone="on"] {
-  background: var(--accent);
-}
-
-.dot[data-tone="off"] {
-  background: transparent;
-  box-shadow: inset 0 0 0 2px var(--faint);
-}
-
-h1 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.2px;
-}
-
-.status {
-  margin: 0 0 14px;
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-  font-size: 14px;
-}
-
-.switch {
-  position: relative;
-  flex: none;
-}
-
-.switch input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.track {
-  display: block;
-  width: 38px;
-  height: 22px;
-  border-radius: 11px;
-  background: var(--border);
-  transition: background 0.15s ease;
-}
-
-.thumb {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  transition: transform 0.15s ease;
-}
-
-.switch input:checked + .track {
-  background: var(--accent);
-}
-
-.switch input:checked + .track .thumb {
-  transform: translateX(16px);
-}
-
-.btn {
-  width: 100%;
-  padding: 10px 14px;
-  border: none;
-  border-radius: 8px;
-  background: var(--accent);
-  color: var(--accent-fg);
-  font:
-    500 14px/1 system-ui,
-    -apple-system,
-    "Segoe UI",
-    sans-serif;
-  cursor: pointer;
-  transition: filter 0.15s ease;
-}
-
-.btn:hover:not(:disabled) {
-  filter: brightness(1.08);
-}
-
-.btn:disabled {
-  background: var(--border);
-  color: var(--faint);
-  cursor: default;
-}
-
-.btn-secondary {
-  margin-top: 8px;
-  background: transparent;
-  color: var(--muted);
-  border: 1px solid var(--border);
-}
-
-.btn-secondary:hover:not(:disabled) {
-  filter: none;
-  color: var(--fg);
-  border-color: var(--faint);
-}
-
 .hint {
-  margin: 12px 0 0;
-  font-size: 11px;
-  color: var(--faint);
   text-align: center;
-}
-
-.hint a {
-  color: var(--muted);
-}
-
-kbd {
-  font: inherit;
-  padding: 1px 4px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
 }

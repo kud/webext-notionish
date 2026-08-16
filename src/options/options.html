@@ -2,40 +2,26 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta name="color-scheme" content="light dark" />
     <title>Notionish Options</title>
-    <style>
-      body {
-        max-width: 600px;
-        margin: 40px auto;
-        font-family: system-ui, sans-serif;
-      }
-
-      .note {
-        font-size: 13px;
-        color: #5b5b66;
-        line-height: 1.5;
-      }
-
-      label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin: 12px 0;
-        font-size: 15px;
-      }
-    </style>
+    <link rel="stylesheet" href="../vendor/tokens.css" />
+    <link rel="stylesheet" href="../vendor/webext-ui.css" />
   </head>
-  <body>
+  <body class="page stack">
     <h1>Notionish</h1>
     <p>Choose which Google surfaces get the Notion-ish focus treatment.</p>
 
-    <label><input type="checkbox" id="docs-enabled" /> Google Docs</label>
-    <label><input type="checkbox" id="sheets-enabled" /> Google Sheets</label>
+    <label class="field-inline">
+      <input type="checkbox" id="docs-enabled" /> Google Docs
+    </label>
+    <label class="field-inline">
+      <input type="checkbox" id="sheets-enabled" /> Google Sheets
+    </label>
 
     <h2>Text size</h2>
 
-    <label>
-      Zoom Google Docs to
+    <label class="field">
+      <span>Zoom Google Docs to</span>
       <select id="zoom-factor">
         <option value="1">100% — Google's default</option>
         <option value="1.1">110%</option>
@@ -46,7 +32,7 @@
       </select>
     </label>
 
-    <p class="note">
+    <p class="field-note">
       Docs draws body text into a canvas, so nothing in a stylesheet can set its
       size. Browser zoom can: it changes the resolution Docs renders against, so
       the canvas is repainted larger rather than scaled up, and the text stays
@@ -55,19 +41,20 @@
       Docs back to 100%. Be aware that this <em>is</em> the site zoom Firefox
       remembers for docs.google.com — Firefox offers no per-tab zoom that the
       browser itself applies — so if you uninstall Notionish while focus mode is
-      on, Docs stays zoomed and you would reset it with <kbd>Cmd</kbd>+<kbd>0</kbd>.
-      Sheets is left alone: the same zoom would work, but it would mean seeing
-      fewer rows, which is a different kind of change.
+      on, Docs stays zoomed and you would reset it with
+      <kbd>Cmd</kbd>+<kbd>0</kbd>. Sheets is left alone: the same zoom would
+      work, but it would mean seeing fewer rows, which is a different kind of
+      change.
     </p>
 
     <h2>Typography</h2>
 
-    <label>
+    <label class="field-inline">
       <input type="checkbox" id="font-override" /> Set document text in Inter
       (experimental — breaks layout)
     </label>
 
-    <p class="note">
+    <p class="field-note">
       Docs paints text to a canvas and places each run of formatting at a
       coordinate computed from the original font's measurements. Inter measures
       differently, so runs overlap — bold text collides with the words either

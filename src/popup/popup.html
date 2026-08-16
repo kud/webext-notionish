@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <title>Notionish</title>
+    <link rel="stylesheet" href="../vendor/tokens.css" />
+    <link rel="stylesheet" href="../vendor/webext-ui.css" />
     <link rel="stylesheet" href="popup.css" />
   </head>
-  <body>
-    <header>
+  <body class="popup stack">
+    <header class="cluster">
       <span class="dot" id="dot"></span>
       <h1>Notionish</h1>
     </header>
@@ -23,9 +25,11 @@
       </span>
     </label>
 
-    <button class="btn" id="action">Show Google's UI on this tab</button>
+    <button class="btn btn-primary btn-block" id="action">
+      Show Google's UI on this tab
+    </button>
 
-    <button class="btn btn-secondary" id="disable">Turn Notionish off</button>
+    <button class="btn btn-block" id="disable">Turn Notionish off</button>
 
     <p class="hint">
       <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>N</kbd> does the same · reloading the
