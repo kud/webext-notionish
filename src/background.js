@@ -1,15 +1,5 @@
-// Background scripts declared via manifest "background.scripts" load as classic
-// scripts (no "type": "module" support in MV2), so this can't import
-// src/lib/storage.js — the two default keys are duplicated here instead.
-const DEFAULT_PREFS = {
-  docsEnabled: true,
-  sheetsEnabled: true,
-  fontOverride: false,
-  zoomFactor: 1.3,
-}
-
 // Defaults are deliberately NOT written to storage on install. Every read goes
-// through storage.sync.get(DEFAULT_PREFS), which already substitutes a default for
+// through settings.get() (src/settings.js), which already substitutes a default for
 // any absent key — so persisting them buys nothing and costs the ability to ever
 // change one. Writing them eagerly froze fontOverride at its original `true` for
 // anyone who had already installed, and flipping the constant afterwards had no

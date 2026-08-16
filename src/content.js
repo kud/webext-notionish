@@ -1,12 +1,3 @@
-// Loaded via manifest content_scripts (classic script, no ES modules available), so
-// preferences here duplicate src/lib/storage.js's defaults rather than importing it.
-const DEFAULT_PREFS = {
-  docsEnabled: true,
-  sheetsEnabled: true,
-  fontOverride: false,
-  zoomFactor: 1.3,
-}
-
 // The families Docs and Sheets set body text in. Deliberately sans-only: a document
 // that asked for Times New Roman asked for a serif, and silently answering with
 // Inter would be a content change rather than a chrome one.
@@ -123,8 +114,8 @@ const DEFAULT_PAGE_WIDTH = 816
 const CHROME_ALLOWANCE = 64
 
 const pageWidth = () =>
-  document.querySelector(".kix-page-paginated")?.getBoundingClientRect().width ||
-  DEFAULT_PAGE_WIDTH
+  document.querySelector(".kix-page-paginated")?.getBoundingClientRect()
+    .width || DEFAULT_PAGE_WIDTH
 
 let appliedZoom = 1
 
@@ -240,7 +231,7 @@ const applySurface = (prefs) => {
 // Only wire up listeners when we're actually on a Docs/Sheets document — nothing to
 // toggle or watch preferences for otherwise.
 if (surface) {
-  browser.storage.sync.get(DEFAULT_PREFS).then(applySurface)
+  settings.get().then(applySurface)
 
   // What fits depends on the window, so the answer changes when the window does.
   // Debounced because a drag fires this continuously, and each pass costs a message
@@ -254,10 +245,7 @@ if (surface) {
     )
   })
 
-  browser.storage.onChanged.addListener((changes, area) => {
-    if (area !== "sync") return
-    browser.storage.sync.get(DEFAULT_PREFS).then(applySurface)
-  })
+  settings.onChange(applySurface)
 
   // Answers with the state it landed on, rather than returning nothing. A toggle
   // that reports back is the difference between "the message arrived and did

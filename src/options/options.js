@@ -1,12 +1,10 @@
-import { getPrefs, setPrefs } from "../lib/storage.js"
-
 document.addEventListener("DOMContentLoaded", async () => {
   const docsEl = document.getElementById("docs-enabled")
   const sheetsEl = document.getElementById("sheets-enabled")
   const fontEl = document.getElementById("font-override")
   const zoomEl = document.getElementById("zoom-factor")
 
-  const prefs = await getPrefs()
+  const prefs = await settings.get()
   docsEl.checked = prefs.docsEnabled
   sheetsEl.checked = prefs.sheetsEnabled
   fontEl.checked = prefs.fontOverride
@@ -21,15 +19,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   zoomEl.value = String(prefs.zoomFactor)
 
   docsEl.addEventListener("change", () =>
-    setPrefs({ docsEnabled: docsEl.checked }),
+    settings.set({ docsEnabled: docsEl.checked }),
   )
   sheetsEl.addEventListener("change", () =>
-    setPrefs({ sheetsEnabled: sheetsEl.checked }),
+    settings.set({ sheetsEnabled: sheetsEl.checked }),
   )
   fontEl.addEventListener("change", () =>
-    setPrefs({ fontOverride: fontEl.checked }),
+    settings.set({ fontOverride: fontEl.checked }),
   )
   zoomEl.addEventListener("change", () =>
-    setPrefs({ zoomFactor: Number(zoomEl.value) }),
+    settings.set({ zoomFactor: Number(zoomEl.value) }),
   )
 })

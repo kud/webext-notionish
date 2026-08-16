@@ -1,5 +1,3 @@
-import { getPrefs, setPrefs } from "../lib/storage.js"
-
 const SURFACE_LABEL = { docs: "Docs", sheets: "Sheets" }
 const SURFACE_PREF_KEY = { docs: "docsEnabled", sheets: "sheetsEnabled" }
 
@@ -31,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     browser.runtime.openOptionsPage()
   })
 
-  const prefs = await getPrefs()
+  const prefs = await settings.get()
 
   // Wired before the surface check below, which returns early on any other tab.
   // Turning Notionish off is exactly the thing you want to reach from a tab where
@@ -58,8 +56,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderDisable(prefs)
 
   disableEl.addEventListener("click", async () => {
-    const next = !anyEnabled(await getPrefs())
-    await setPrefs({ docsEnabled: next, sheetsEnabled: next })
+    const next = !anyEnabled(await settings.get())
+    await settings.set({ docsEnabled: next, sheetsEnabled: next })
     window.close()
   })
 
@@ -102,9 +100,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   })
 
   enabledEl.addEventListener("change", async () => {
-    await setPrefs({ [prefKey]: enabledEl.checked })
+    await settings.set({ [prefKey]: enabledEl.checked })
     render(enabledEl.checked)
-    renderDisable(await getPrefs())
+    renderDisable(await settings.get())
   })
 
   // Closing the popup on the same tick as the send is how this failure hid for two

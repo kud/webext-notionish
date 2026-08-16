@@ -23,7 +23,7 @@
   "content_scripts": [
     {
       "matches": ["https://docs.google.com/*", "https://sheets.google.com/*"],
-      "js": ["src/content.js"],
+      "js": ["src/vendor/webext.js", "src/settings.js", "src/content.js"],
       "css": [
         "src/content/shared.css",
         "src/content/docs.css",
