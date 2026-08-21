@@ -14,6 +14,13 @@
 
 </div>
 
+> [!NOTE]
+> **Prototype — not on addons.mozilla.org yet.** v1 is deliberately cosmetic and
+> narrow, and it has never been submitted for review, so there is no one-click
+> install. Load it as a temporary add-on from source (see Development below).
+> Google ships Docs and Sheets markup that changes without notice, so expect the
+> selectors in `SELECTORS.md` to need chasing.
+
 Google Docs and Sheets are visually loud: a dense Material toolbar, two rulers, a left rail carrying the outline and tab strip, and a grey backdrop with a paper drop-shadow around every page. Notion's appeal is the opposite — the page is nearly the only thing on screen. Notionish borrows that restraint for Docs and Sheets.
 
 v1 is deliberately cosmetic and narrow: it hides the furniture around the document. It does not touch the document itself.
