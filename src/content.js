@@ -180,7 +180,7 @@ const surface = detectSurface(new URL(location.href))
 // The toggle listener runs synchronously and needs the zoom factor, which lives in
 // storage. Cached on every apply rather than re-read, so Alt+Shift+N cannot land
 // between the keypress and a storage round-trip.
-let currentPrefs = DEFAULT_PREFS
+let currentPrefs = settings.defaults
 
 // Docs only. Sheets cell text is painted to canvas the same way and would zoom
 // just as well, but a spreadsheet at 130% shows fewer rows — that is a change to
