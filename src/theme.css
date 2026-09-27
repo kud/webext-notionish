@@ -1,0 +1,18 @@
+/* Notionish — identity.
+ *
+ * The extension's accent pair, and nothing else. Linked after the vendored
+ * @kud/webext-ui files on every page, so a new page cannot fall back to the
+ * default orange by forgetting it.
+ */
+
+:root {
+  --accent: #37352f;
+  --accent-fg: #ffffff; /* 12.26:1 on --accent */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent: #e3e1dc;
+    --accent-fg: #1c1b22; /* 13.07:1 on --accent */
+  }
+}

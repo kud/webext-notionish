@@ -10,18 +10,6 @@
  * on purpose.
  */
 
-:root {
-  --accent: #37352f;
-  --accent-fg: #ffffff; /* 12.26:1 on --accent */
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --accent: #e3e1dc;
-    --accent-fg: #1c1b22; /* 13.07:1 on --accent */
-  }
-}
-
 .hint {
   text-align: center;
 }

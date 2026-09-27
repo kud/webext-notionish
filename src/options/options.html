@@ -6,6 +6,7 @@
     <title>Notionish Options</title>
     <link rel="stylesheet" href="../vendor/tokens.css" />
     <link rel="stylesheet" href="../vendor/webext-ui.css" />
+    <link rel="stylesheet" href="../theme.css" />
   </head>
   <body class="page stack">
     <h1>Notionish</h1>
@@ -50,11 +51,11 @@
     <h2>Typography</h2>
 
     <label class="field-inline">
-      <input type="checkbox" id="font-override" /> Set document text in Inter
+      <input type="checkbox" id="font-override" aria-describedby="font-override-note" /> Set document text in Inter
       (experimental — breaks layout)
     </label>
 
-    <p class="field-note">
+    <p class="field-note" id="font-override-note">
       Docs paints text to a canvas and places each run of formatting at a
       coordinate computed from the original font's measurements. Inter measures
       differently, so runs overlap — bold text collides with the words either
