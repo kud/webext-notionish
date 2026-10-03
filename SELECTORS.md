@@ -1,8 +1,8 @@
 # Selector reliance
 
-Notionish is CSS-first: `src/content.js` tags the document with
+Notionish is CSS-first: `entrypoints/content/index.js` tags the document with
 `data-notionish-surface` / `data-notionish-focus` attributes, and the stylesheets in
-`src/content/*.css` do all the actual hiding and restyling, gated behind those
+`entrypoints/content/*.css` do all the actual hiding and restyling, gated behind those
 attributes. If `content.js` never runs (blocked, Google reshuffled the URL shape) or
 a selector below stops matching, the corresponding rule is simply inert — the
 default is always "stock Google UI stays visible", never a hidden or broken page.

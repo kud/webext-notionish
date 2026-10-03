@@ -1,7 +1,7 @@
 /* Notionish — Google Docs focus mode
    Gate: html[data-notionish-surface="docs"][data-notionish-focus="on"]. If that
    attribute pair is never set, none of this fires and stock Google Docs renders
-   untouched — see src/content.js for how it's set, and SELECTORS.md for the
+   untouched — see entrypoints/content/index.js for how it's set, and SELECTORS.md for the
    evidence behind every selector below. Verified live on 2026-08-11.
 
    Restyling rules carry !important for the same reason hiding rules do. Without it
@@ -32,7 +32,7 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"]
 }
 
 /* The header band is kept, but it should not grow with the document. Browser zoom
-   is the only lever that reaches canvas text (see src/content.js), and it scales
+   is the only lever that reaches canvas text (see entrypoints/content/index.js), and it scales
    everything — so the chrome we deliberately left in place gets 30% heavier for no
    benefit. --notionish-header-scale is the reciprocal of the zoom factor, set on
    <html> by content.js, and 1 when zoom is off.

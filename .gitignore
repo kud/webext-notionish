@@ -6,3 +6,5 @@ web-ext-artifacts/
 .env*
 .mcp.json
 .claude/
+.output/
+.wxt/

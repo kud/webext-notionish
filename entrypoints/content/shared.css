@@ -1,6 +1,6 @@
 /* Notionish — shared chrome styling
    Gate: html[data-notionish-surface][data-notionish-focus="on"], set by
-   src/content.js only once it has confirmed the current URL is a Docs/Sheets
+   entrypoints/content/index.js only once it has confirmed the current URL is a Docs/Sheets
    document and the surface is enabled in options. If that attribute pair is never
    set — content.js didn't run, Google reshuffled the URL shape, the surface is
    disabled — every rule below is inert and stock Google chrome renders untouched.
@@ -29,7 +29,7 @@
    NotionInter is a proprietary tuning of Inter, so Inter is the substitute Notion's
    own design system names. #37352f is Notion's product text colour. */
 html[data-notionish-surface][data-notionish-focus="on"] {
-  /* "Notionish Inter" is the bundled woff2, registered by src/content.js under a
+  /* "Notionish Inter" is the bundled woff2, registered by entrypoints/content/index.js under a
      name no document uses. Leading with plain Inter first would be a phantom: it is
      not installed on most machines, so the stack silently fell through to
      -apple-system and the header rendered in SF Pro while claiming to be Notion's

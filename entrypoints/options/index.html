@@ -4,9 +4,7 @@
     <meta charset="utf-8" />
     <meta name="color-scheme" content="light dark" />
     <title>Notionish Options</title>
-    <link rel="stylesheet" href="../vendor/tokens.css" />
-    <link rel="stylesheet" href="../vendor/webext-ui.css" />
-    <link rel="stylesheet" href="../theme.css" />
+    <meta name="manifest.browser_style" content="true" />
   </head>
   <body class="page stack">
     <h1>Notionish</h1>
@@ -71,8 +69,6 @@
       disabling the extension.
     </p>
 
-    <script src="../vendor/webext.js"></script>
-    <script src="../settings.js"></script>
-    <script src="options.js"></script>
+    <script type="module" src="./main.js"></script>
   </body>
 </html>

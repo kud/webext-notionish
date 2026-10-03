@@ -1,7 +1,7 @@
 /* Notionish — Google Sheets focus mode
    Gate: html[data-notionish-surface="sheets"][data-notionish-focus="on"]. If that
    attribute pair is never set, none of this fires and stock Google Sheets renders
-   untouched — see src/content.js for how it's set, and SELECTORS.md for the full
+   untouched — see entrypoints/content/index.js for how it's set, and SELECTORS.md for the full
    confidence tiering of every selector below. Summary:
      CONFIRMED  #docs-titlebar, #docs-menubar, #docs-toolbar-wrapper,
                 #docs-header-container, #waffle-grid-container

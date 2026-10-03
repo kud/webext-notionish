@@ -54,7 +54,7 @@ npm install
 npm run build
 ```
 
-Load it in Firefox: `about:debugging#/runtime/this-firefox` → **Load Temporary Add-on** → select `manifest.json` (or the built package in `web-ext-artifacts/`). Temporary add-ons are dropped on restart and must be reloaded after every change.
+Load it in Firefox: `about:debugging#/runtime/this-firefox` → **Load Temporary Add-on** → select `.output/firefox-mv2/manifest.json`. Temporary add-ons are dropped on restart and must be reloaded after every change.
 
 ## 🚀 Quick Start
 
@@ -66,7 +66,7 @@ Once installed, Notionish is on by default for both Docs and Sheets — open any
 
 ## 🧭 How it works
 
-Notionish is CSS-first by design. `src/content.js` runs at `document_start`, resolves which surface the tab is on from the URL, and — once `browser.storage.sync` confirms that surface is enabled — tags `<html>` with `data-notionish-surface` and `data-notionish-focus` attributes. Every hiding and restyling rule lives in `src/content/{shared,docs,sheets}.css`, gated behind those attributes. No JavaScript touches the document itself.
+Notionish is CSS-first by design. `entrypoints/content/index.js` runs at `document_start`, resolves which surface the tab is on from the URL, and — once `browser.storage.sync` confirms that surface is enabled — tags `<html>` with `data-notionish-surface` and `data-notionish-focus` attributes. Every hiding and restyling rule lives in `entrypoints/content/{shared,docs,sheets}.css`, gated behind those attributes. No JavaScript touches the document itself.
 
 That split is deliberate: **if the JS never runs, or a selector stops matching after a Google redesign, the corresponding attribute is simply never set and the rule stays inert.** The failure mode is always "you see Google's normal interface" — never a hidden or broken page.
 
@@ -104,30 +104,32 @@ npm run dev
 
 The dev profile is deliberately its own, not a copy of your daily one: your real profile is never opened by tooling, and the 800MB copy that copying it would cost on every launch never happens.
 
-For a one-off manual load instead, use `about:debugging#/runtime/this-firefox` → **Load Temporary Add-on** → `manifest.json`. Temporary add-ons do **not** hot-reload — `about:debugging` needs an explicit **Reload** after every change, which `npm run dev` handles for you.
+For a one-off manual load instead, use `about:debugging#/runtime/this-firefox` → **Load Temporary Add-on** → `.output/firefox-mv2/manifest.json` after `npm run build`. Temporary add-ons do **not** hot-reload — `about:debugging` needs an explicit **Reload** after every change, which `npm run dev` handles for you.
 
 ```
-src/
-├── background.js          # MV2 background script — keyboard command relay
-├── content.js              # runs at document_start, resolves surface, tags <html>
+entrypoints/
+├── background.js            # MV2 background script — keyboard command and zoom relay
 ├── content/
-│   ├── shared.css          # rules shared by Docs and Sheets
+│   ├── index.js             # runs at document_start, resolves surface, tags <html>
+│   ├── shared.css           # rules shared by Docs and Sheets
 │   ├── docs.css             # Docs-specific hiding/restyling
 │   └── sheets.css           # Sheets-specific hiding/restyling
-├── icons/icon.svg           # the extension mark, single SVG at every size
-├── lib/storage.js           # browser.storage.sync helpers (popup/options only)
 ├── options/                 # options page
 └── popup/                   # toolbar popup
+utils/settings.js            # the one declaration of persisted settings (@kud/webext)
+assets/theme.css             # accent pair layered over @kud/webext-ui
+public/                      # copied verbatim: icons/, fonts/ (Inter + licence)
+wxt.config.ts                # manifest, gecko id, dev profile, build target
 ```
 
 | Script            | What it does                                                                  |
 | ----------------- | ----------------------------------------------------------------------------- |
 | `npm run dev`       | Launches Firefox Nightly on the persistent dev profile, extension loaded and watched |
 | `npm run dev:clean` | Same, but on a fresh throwaway profile — no Google session                          |
-| `npm run lint`    | Runs `web-ext lint`                                                           |
-| `npm run build`   | Builds a signable package into `web-ext-artifacts/`                           |
-| `npm run version` | Syncs `manifest.json`'s version from `package.json` (used by release tooling) |
-| `npm run publish` | Builds and opens the AMO Developer Hub for a first manual submission          |
+| `npm run build`   | Builds the extension into `.output/firefox-mv2` with WXT                      |
+| `npm run zip`     | Builds, then zips the package and the AMO sources archive into `.output/`     |
+| `npm run lint`    | Runs `web-ext lint` on `.output/firefox-mv2` (run after build)                |
+| `npm run publish` | Zips and opens the AMO Developer Hub for a first manual submission            |
 
 `tools/` holds three page-console probes, none of which ship in the package:
 
@@ -139,9 +141,9 @@ src/
 
 Each copies itself to the clipboard, because the step after "which probe do I want" is always "get it into the console" — paste into the page console on a real Doc (`Cmd+Opt+K`, not the Browser Console) and read the output per [`SELECTORS.md`](SELECTORS.md). macOS only, being `pbcopy`; `cat` the file anywhere else.
 
-Both `src/background.js` and `src/content.js` load as classic (non-module) scripts under Manifest V2, so they duplicate `DEFAULT_PREFS` from `src/lib/storage.js` rather than importing it — `storage.js` itself is only imported by the popup and options page, which do run as ES modules.
+WXT bundles every entrypoint, so the background, content script, popup and options page all import `utils/settings.js` rather than each keeping its own defaults. The manifest is generated from `wxt.config.ts`; its version comes from `package.json`.
 
-Releases are signed and uploaded to AMO automatically by [`.github/workflows/release.yml`](.github/workflows/release.yml) on every `v*` tag push. The very first submission of a new add-on can't go through that pipeline — AMO requires it manually via the Developer Hub — so `npm run publish` builds the package and opens the Hub for that one-off step.
+Releases are signed and uploaded to AMO automatically by [`.github/workflows/release.yml`](.github/workflows/release.yml) on every `v*` tag push. The very first submission of a new add-on can't go through that pipeline — AMO requires it manually via the Developer Hub — so `npm run publish` zips the package and opens the Hub for that one-off step.
 
 ## 🏗 Tech Stack
 
@@ -152,7 +154,7 @@ Releases are signed and uploaded to AMO automatically by [`.github/workflows/rel
 | Language     | Vanilla JavaScript — ES modules where the manifest allows it |
 | Styling      | Hand-written CSS, gated by `data-notionish-*` attributes     |
 | Storage      | `browser.storage.sync`                                       |
-| Tooling      | `web-ext` 10.6.0 — pinned exact, drives lint/run/build/sign  |
+| Tooling      | WXT 0.21.4 builds and zips; `web-ext` 10.7.0 lints and signs |
 | CI / Release | GitHub Actions — signs and uploads to AMO on `v*` tag push   |
 
 ---

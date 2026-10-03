@@ -1,7 +1,13 @@
+import "@kud/webext-ui/tokens.css"
+import "@kud/webext-ui/webext-ui.css"
+import "../../assets/theme.css"
+import "./popup.css"
+import { settings } from "../../utils/settings"
+
 const SURFACE_LABEL = { docs: "Docs", sheets: "Sheets" }
 const SURFACE_PREF_KEY = { docs: "docsEnabled", sheets: "sheetsEnabled" }
 
-// Mirrors the detection in src/content.js — kept separate because the popup
+// Mirrors the detection in entrypoints/content/index.js — kept separate because the popup
 // resolves the surface from the active tab's URL, not from a page it's injected
 // into, so sharing a single function across both contexts isn't practical.
 const detectSurface = (url) => {

@@ -1,3 +1,8 @@
+import "@kud/webext-ui/tokens.css"
+import "@kud/webext-ui/webext-ui.css"
+import "../../assets/theme.css"
+import { settings } from "../../utils/settings"
+
 document.addEventListener("DOMContentLoaded", async () => {
   const docsEl = document.getElementById("docs-enabled")
   const sheetsEl = document.getElementById("sheets-enabled")

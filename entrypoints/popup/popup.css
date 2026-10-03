@@ -1,10 +1,9 @@
 /* Notionish — popup identity.
  *
- * Everything shared lives in the vendored design system at src/vendor/
- * (@kud/webext-ui). Re-sync with:
- *   npx @kud/webext-ui@latest sync src/vendor/
+ * Everything shared comes from the @kud/webext-ui npm package, imported by
+ * main.js ahead of this file.
  *
- * Note this is the popup only. src/content/ deliberately does not adopt the
+ * Note this is the popup only. entrypoints/content/ deliberately does not adopt the
  * system: it restyles Google's own DOM and needs to win the cascade rather
  * than be isolated, and its --notionish-* tokens impersonate Notion's palette
  * on purpose.
