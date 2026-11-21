@@ -13,6 +13,7 @@ const settings = webext.defineSettings(
     sheetsEnabled: true,
     fontOverride: false,
     zoomFactor: 1.3,
+    hoverReveal: false,
   },
   { area: "sync" },
 )

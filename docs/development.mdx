@@ -39,6 +39,16 @@ JavaScript reaches past the stylesheets in only three places, all because canvas
 
 `src/settings.js` is the single declaration of the stored preferences, loaded as a classic script by the content script, popup and options page alike.
 
+## Tests
+
+`tools/peek.test.js` pins the hover-reveal decision in `src/content.js` with Node's built-in runner, no dependencies needed:
+
+```sh
+node --test tools/peek.test.js
+```
+
+It lives under `tools/` so it stays out of the built package.
+
 ## Probing Google's markup
 
 Google changes Docs and Sheets markup without notice. Every selector the stylesheets depend on is tracked in `SELECTORS.md`, tiered by evidence: confirmed on a live document, confirmed absent, or unverified. When something reappears, probe rather than guess.
