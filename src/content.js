@@ -204,6 +204,75 @@ const zoomFor = (focus) =>
 // triggered it already.
 const nudgeRelayout = () => window.dispatchEvent(new Event("resize"))
 
+// Hover-reveal: the menu row and toolbar come back while the pointer is on the
+// header band, and go again once it leaves. Alt+Shift+N brings back *all* of
+// Google's UI and resets the zoom; this is the lighter gesture for reaching one
+// menu without leaving focus mode. Opt-in, because revealing the row is a layout
+// change — the document moves down by the row's height and back up afterwards —
+// and that is not something to spring on anyone unasked.
+//
+// It works by a third attribute rather than by flipping the focus gate. Clearing
+// data-notionish-focus would also undo the header scale, the rulers, the rail and
+// the zoom, so a hover would repaint the whole canvas twice. The stylesheets'
+// hiding rules for the row carry :not([data-notionish-peek]) instead, and every
+// other rule is untouched by it.
+//
+// The trigger is the header band, which focus mode keeps visible, plus the top few
+// pixels of the window as a fallback should Google rename the band. Once revealed,
+// the row stays while the pointer is anywhere in the chrome or in an open Closure
+// menu — a File menu drops below the row, and hiding the row the moment the pointer
+// reached it would close the menu out from under the click.
+const PEEK_EDGE = 6
+const PEEK_GRACE_MS = 400
+const PEEK_TRIGGER = "#docs-header-container"
+const PEEK_HOLD =
+  "#docs-header-container, #docs-chrome, #docs-bars, .goog-menu, [role='menu'], [role='listbox']"
+
+const insideOf = (target, selector) =>
+  typeof target?.closest === "function" && target.closest(selector) !== null
+
+// Pure, so tools/peek.test.js can pin it without a browser.
+const peekWanted = ({ peeking, y, target }) => {
+  if (y <= PEEK_EDGE) return true
+  if (insideOf(target, PEEK_TRIGGER)) return true
+  return peeking && insideOf(target, PEEK_HOLD)
+}
+
+let peekTimer
+
+const setPeek = (on) => {
+  clearTimeout(peekTimer)
+  peekTimer = undefined
+  const root = document.documentElement
+  if (Boolean(root.dataset.notionishPeek) === on) return
+  if (on) root.dataset.notionishPeek = "on"
+  else delete root.dataset.notionishPeek
+  // The row takes height when it returns and gives it back when it goes, and Docs
+  // sizes its scroll area in JavaScript — the same reason the rail needs this.
+  nudgeRelayout()
+}
+
+const onPeekPointer = (event) => {
+  const root = document.documentElement
+  if (
+    !currentPrefs.hoverReveal ||
+    !root.dataset.notionishSurface ||
+    root.dataset.notionishFocus !== "on"
+  )
+    return setPeek(false)
+
+  const peeking = Boolean(root.dataset.notionishPeek)
+  if (peekWanted({ peeking, y: event.clientY, target: event.target }))
+    return setPeek(true)
+  // A short grace rather than an instant hide: the pointer crossing a gap between
+  // the row and a dropdown should not collapse the row in between.
+  if (peeking && !peekTimer)
+    peekTimer = setTimeout(() => {
+      peekTimer = undefined
+      setPeek(false)
+    }, PEEK_GRACE_MS)
+}
+
 const applySurface = (prefs) => {
   currentPrefs = prefs
   const root = document.documentElement
@@ -222,6 +291,7 @@ const applySurface = (prefs) => {
     delete root.dataset.notionishFocus
   }
 
+  if (!enabled || !prefs.hoverReveal) setPeek(false)
   applyUiFont(enabled)
   applyFontOverride(enabled && prefs.fontOverride)
   applyZoom(zoomFor(root.dataset.notionishFocus))
@@ -247,6 +317,11 @@ if (surface) {
 
   settings.onChange(applySurface)
 
+  // Passive and always attached: the handler bails on its first check when the
+  // preference is off, which is cheaper than adding and removing the listener as
+  // the preference changes.
+  document.addEventListener("pointermove", onPeekPointer, { passive: true })
+
   // Answers with the state it landed on, rather than returning nothing. A toggle
   // that reports back is the difference between "the message arrived and did
   // something" and "the message arrived at a tab where the gate was never set" —
@@ -259,6 +334,8 @@ if (surface) {
     if (!root.dataset.notionishSurface) return
     const focus = root.dataset.notionishFocus === "on" ? "off" : "on"
     root.dataset.notionishFocus = focus
+    // Focus off shows the row anyway, and focus back on should start hidden.
+    setPeek(false)
     // Focus off means the full Google UI is back, and a Doc at 130% is not that.
     applyZoom(zoomFor(focus))
     // Toggling puts the rail back, which frees and reclaims the same width — so the

@@ -19,11 +19,15 @@ html[data-notionish-surface="sheets"][data-notionish-focus="on"] {
    What goes is the row beneath: menus and toolbar. Hide the *row* (#docs-bars), not
    just its contents — hiding #docs-menubar and #docs-toolbar-wrapper while their
    container stays leaves the row's height behind with the search pill and collapse
-   chevron stranded in it. The inner ids stay as independent fallbacks. */
-html[data-notionish-surface="sheets"][data-notionish-focus="on"] #docs-bars,
-html[data-notionish-surface="sheets"][data-notionish-focus="on"] #docs-menubars,
-html[data-notionish-surface="sheets"][data-notionish-focus="on"] #docs-menubar,
-html[data-notionish-surface="sheets"][data-notionish-focus="on"]
+   chevron stranded in it. The inner ids stay as independent fallbacks.
+
+   :not([data-notionish-peek]) is the hover-reveal opt-out: src/content.js sets that
+   attribute while the pointer is on the header band, which brings this row — and
+   only this row — back without touching the focus gate. */
+html[data-notionish-surface="sheets"][data-notionish-focus="on"]:not([data-notionish-peek]) #docs-bars,
+html[data-notionish-surface="sheets"][data-notionish-focus="on"]:not([data-notionish-peek]) #docs-menubars,
+html[data-notionish-surface="sheets"][data-notionish-focus="on"]:not([data-notionish-peek]) #docs-menubar,
+html[data-notionish-surface="sheets"][data-notionish-focus="on"]:not([data-notionish-peek])
   #docs-toolbar-wrapper {
   display: none !important;
 }

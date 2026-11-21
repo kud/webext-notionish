@@ -34,6 +34,7 @@ v1 is deliberately cosmetic and narrow: it hides the furniture around the docume
 - ✍️ **Notion-ish chrome typography** — restyles the UI that survives (comment cards, dialogs, context menus) to match, and sets it in the bundled Inter under a private family name so the chrome gets Notion's face while the document's canvas is untouched.
 - 🔘 **Quieted title bar** — the header band painted flat white, the Material icon buttons reduced to hairline circles, and Share given a white fill with a grey outline instead of its blue pill. The row aligns on middles rather than baselines, so it stays put when the typeface changes.
 - ⌨️ **One-key toggle** — `Alt+Shift+N`, or the popup button, brings the full Google UI back instantly without disabling the extension.
+- 🫥 **Toolbar on hover** (opt-in) — rest the pointer on the title bar and the menus and toolbar come back until it leaves.
 - 🎚 **Per-surface control** — enable or disable Docs and Sheets independently from the popup or options page, synced via `browser.storage.sync`.
 - 🛡 **Fails safe** — if a selector stops matching after a Google redesign, the affected element simply stays visible; the page is never left broken.
 

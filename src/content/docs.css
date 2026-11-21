@@ -22,11 +22,15 @@ html[data-notionish-surface="docs"][data-notionish-focus="on"] {
    container stays leaves the row's height behind with the search pill and the
    collapse chevron stranded in it — visibly broken in a way that hiding either the
    whole band or nothing at all never is. The inner ids are kept as fallbacks: they
-   fail independently, so a renamed container still empties the row. */
-html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-bars,
-html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-menubars,
-html[data-notionish-surface="docs"][data-notionish-focus="on"] #docs-menubar,
-html[data-notionish-surface="docs"][data-notionish-focus="on"]
+   fail independently, so a renamed container still empties the row.
+
+   :not([data-notionish-peek]) is the hover-reveal opt-out: src/content.js sets that
+   attribute while the pointer is on the header band, which brings this row — and
+   only this row — back without touching the focus gate. */
+html[data-notionish-surface="docs"][data-notionish-focus="on"]:not([data-notionish-peek]) #docs-bars,
+html[data-notionish-surface="docs"][data-notionish-focus="on"]:not([data-notionish-peek]) #docs-menubars,
+html[data-notionish-surface="docs"][data-notionish-focus="on"]:not([data-notionish-peek]) #docs-menubar,
+html[data-notionish-surface="docs"][data-notionish-focus="on"]:not([data-notionish-peek])
   #docs-toolbar-wrapper {
   display: none !important;
 }

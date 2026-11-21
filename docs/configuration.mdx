@@ -13,12 +13,19 @@ Open the options page from the popup's **Open options** link, or from the add-on
 | Google Sheets                  | `sheetsEnabled` | `true`  | Applies the focus treatment to Sheets.                     |
 | Zoom Google Docs to            | `zoomFactor`    | `1.3`   | Text size for Docs while focus mode is on.                 |
 | Set document text in Inter     | `fontOverride`  | `false` | Experimental document typeface swap; breaks layout.        |
+| Show the menus and toolbar while the pointer is on the title bar | `hoverReveal` | `false` | Reveals the menu row and toolbar on hover. |
 
 Defaults are not written to storage on install. A key you have never changed is read as its default, so a future change of default reaches you too.
 
 ## Surfaces
 
 Unticking **Google Docs** or **Google Sheets** turns the extension off for that surface entirely: no attributes are set on the page, no styling applies, and Docs is put back to 100% zoom. The popup's per-surface switch and its **Turn off everywhere** button write the same two keys.
+
+## Toolbar on hover
+
+**Show the menus and toolbar while the pointer is on the title bar** brings back the menu row and toolbar, and nothing else, while the pointer is on the title bar, on the revealed row itself or in a menu opened from it. They hide again about 400 ms after the pointer leaves. Focus mode, the hidden rulers and rail, and the Docs zoom all stay as they are. It applies to Docs and Sheets alike.
+
+It is off by default: the row takes its height back when it appears, so the document shifts down while it shows.
 
 ## Text size
 

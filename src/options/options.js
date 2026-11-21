@@ -3,11 +3,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   const sheetsEl = document.getElementById("sheets-enabled")
   const fontEl = document.getElementById("font-override")
   const zoomEl = document.getElementById("zoom-factor")
+  const hoverEl = document.getElementById("hover-reveal")
 
   const prefs = await settings.get()
   docsEl.checked = prefs.docsEnabled
   sheetsEl.checked = prefs.sheetsEnabled
   fontEl.checked = prefs.fontOverride
+  hoverEl.checked = prefs.hoverReveal
   // A stored factor with no matching <option> would leave the select showing the
   // first entry — 100% — while the tab renders at something else. Add the value
   // rather than silently misreport it.
@@ -26,6 +28,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   )
   fontEl.addEventListener("change", () =>
     settings.set({ fontOverride: fontEl.checked }),
+  )
+  hoverEl.addEventListener("change", () =>
+    settings.set({ hoverReveal: hoverEl.checked }),
   )
   zoomEl.addEventListener("change", () =>
     settings.set({ zoomFactor: Number(zoomEl.value) }),
